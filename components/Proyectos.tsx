@@ -44,7 +44,7 @@ export default function Proyectos() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '24px',
           }}
         >
@@ -83,23 +83,23 @@ export default function Proyectos() {
                       </p>
                     </div>
                   </div>
-                  {/* Mobile caption */}
-                  <div style={{ padding: '16px 0 8px' }}>
-                    <p
-                      style={{
-                        fontSize: '10px',
-                        letterSpacing: '0.12em',
-                        textTransform: 'uppercase',
-                        color: '#8B6F47',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      {p.category} · {p.location} · {p.year}
-                    </p>
-                    <p className="serif" style={{ fontSize: '17px', fontWeight: 400 }}>
-                      {p.name}
-                    </p>
-                  </div>
+                </div>
+                {/* Caption fuera del project-card para que el overlay no la tape */}
+                <div style={{ padding: '16px 0 8px' }}>
+                  <p
+                    style={{
+                      fontSize: '10px',
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: '#8B6F47',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    {p.category} · {p.location} · {p.year}
+                  </p>
+                  <p className="serif" style={{ fontSize: '17px', fontWeight: 400 }}>
+                    {p.name}
+                  </p>
                 </div>
               </Link>
             </FadeIn>
