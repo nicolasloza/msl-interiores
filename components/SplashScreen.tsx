@@ -1,15 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 
 const MIN_MS = 5000;
 const FADE_MS = 700;
 
+function lockScroll() {
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+}
+
+function unlockScroll() {
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+}
+
 export default function SplashScreen() {
   const [phase, setPhase] = useState<'visible' | 'fading' | 'gone'>('visible');
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
+  useLayoutEffect(() => {
+    lockScroll();
 
     const navStart = Number(sessionStorage.getItem('msl-nav-start') || Date.now());
     const elapsed = Date.now() - navStart;
@@ -18,13 +28,13 @@ export default function SplashScreen() {
     const fadeTimer = setTimeout(() => setPhase('fading'), remaining);
     const goneTimer = setTimeout(() => {
       setPhase('gone');
-      document.body.style.overflow = '';
+      unlockScroll();
     }, remaining + FADE_MS);
 
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(goneTimer);
-      document.body.style.overflow = '';
+      unlockScroll();
     };
   }, []);
 
