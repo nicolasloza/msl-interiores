@@ -16,9 +16,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
+  const desc = project.desafio.slice(0, 155);
   return {
     title: `${project.name} | MSL Interiores`,
-    description: project.desafio.slice(0, 155),
+    description: desc,
+    openGraph: {
+      title: `${project.name} | MSL Interiores`,
+      description: desc,
+      images: [{ url: project.img, width: 1200, height: 800, alt: project.name }],
+      type: 'website',
+      locale: 'es_AR',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: [project.img],
+    },
   };
 }
 
@@ -37,9 +49,8 @@ export default async function ProyectoPage({ params }: PageProps) {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: '#FDFAF5', color: '#2C2420' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500&family=Inter:wght@300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        .serif { font-family: 'Playfair Display', serif; }
+        .serif { font-family: var(--font-playfair), serif; }
         .ficha-item { border-top: 1px solid #EDE8E0; padding: 24px 0; }
         .proj-nav-link {
           text-decoration: none;

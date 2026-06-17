@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -51,11 +51,44 @@ export default function Navbar({
   const [open, setOpen] = useState(false);
   const [proyectosOpen, setProyectosOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
 
   function close() {
     setOpen(false);
     setProyectosOpen(false);
   }
+
+  useEffect(() => {
+    if (open) {
+      const first = sidebarRef.current?.querySelector<HTMLElement>('button, a[href]');
+      first?.focus();
+    } else {
+      triggerRef.current?.focus();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key !== 'Tab') return;
+      const sidebar = sidebarRef.current;
+      if (!sidebar) return;
+      const focusable = Array.from(
+        sidebar.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]')
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open]);
 
   function handleDashboardClick() {
     close();
@@ -104,8 +137,11 @@ export default function Navbar({
 
         {/* Botón menú */}
         <button
+          ref={triggerRef}
           onClick={() => setOpen(true)}
           aria-label="Abrir menú"
+          aria-expanded={open}
+          aria-controls="nav-sidebar"
           style={{
             background: 'none',
             border: 'none',
@@ -148,6 +184,11 @@ export default function Navbar({
 
       {/* Sidebar */}
       <aside
+        ref={sidebarRef}
+        id="nav-sidebar"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
         style={{
           position: 'fixed',
           top: 0, right: 0, bottom: 0,
@@ -226,6 +267,7 @@ export default function Navbar({
               <button
                 onClick={() => setProyectosOpen((v) => !v)}
                 aria-label={proyectosOpen ? 'Colapsar proyectos' : 'Expandir proyectos'}
+                aria-expanded={proyectosOpen}
                 style={{
                   background: 'none',
                   border: 'none',

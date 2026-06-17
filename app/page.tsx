@@ -1,5 +1,6 @@
 export const revalidate = 60;
 
+import type { Metadata } from 'next';
 import ScrollToHash from '@/components/ScrollToHash';
 import Navbar from '@/components/Navbar';
 import SplashScreen from '@/components/SplashScreen';
@@ -11,6 +12,24 @@ import Proceso from '@/components/Proceso';
 import Contacto from '@/components/Contacto';
 import Footer from '@/components/Footer';
 import { getSiteContent, getPublishedProjects } from '@/lib/data-access';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getSiteContent();
+  const desc = 'Estudio de diseño de interiores residencial. Proyectos integrales y dirección de obra.';
+  return {
+    openGraph: {
+      title: 'MSL Interiores | Diseño de interiores residencial',
+      description: desc,
+      images: [{ url: content.hero.imagen, width: 1200, height: 800, alt: 'MSL Interiores' }],
+      type: 'website',
+      locale: 'es_AR',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: [content.hero.imagen],
+    },
+  };
+}
 
 export default async function Page() {
   const [content, projects] = await Promise.all([

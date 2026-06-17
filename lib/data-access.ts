@@ -117,13 +117,16 @@ export const getPublishedProjects = cache(async (): Promise<ProjectDB[]> => {
   if (!isDbConfigured()) {
     return PROJECTS.map((p, i) => ({ ...p, publicado: true, orden: i + 1 }));
   }
-
-  const rows = await prisma.project.findMany({
-    where: { publicado: true },
-    orderBy: { orden: 'asc' },
-    include: { images: true },
-  });
-  return rows.map(mapProject);
+  try {
+    const rows = await prisma.project.findMany({
+      where: { publicado: true },
+      orderBy: { orden: 'asc' },
+      include: { images: true },
+    });
+    return rows.map(mapProject);
+  } catch {
+    return PROJECTS.map((p, i) => ({ ...p, publicado: true, orden: i + 1 }));
+  }
 });
 
 export const getProjectBySlug = cache(async (slug: string): Promise<ProjectDB | null> => {
@@ -263,27 +266,32 @@ const defaultContent: SiteContent = {
 
 export async function getSiteContent(): Promise<SiteContent> {
   if (!isDbConfigured()) return defaultContent;
-
-  const rows = await prisma.siteContent.findMany();
-  if (!rows.length) return defaultContent;
-
-  const content = { ...defaultContent };
-  for (const row of rows) {
-    const key = row.section as keyof SiteContent;
-    if (key in content) {
-      (content as Record<string, unknown>)[key] = row.data;
+  try {
+    const rows = await prisma.siteContent.findMany();
+    if (!rows.length) return defaultContent;
+    const content = { ...defaultContent };
+    for (const row of rows) {
+      const key = row.section as keyof SiteContent;
+      if (key in content) {
+        (content as Record<string, unknown>)[key] = row.data;
+      }
     }
+    return content;
+  } catch {
+    return defaultContent;
   }
-  return content;
 }
 
 export async function getSiteSection<K extends keyof SiteContent>(
   section: K
 ): Promise<SiteContent[K]> {
   if (!isDbConfigured()) return defaultContent[section];
-
-  const row = await prisma.siteContent.findUnique({ where: { section } });
-  return row ? (row.data as SiteContent[K]) : defaultContent[section];
+  try {
+    const row = await prisma.siteContent.findUnique({ where: { section } });
+    return row ? (row.data as SiteContent[K]) : defaultContent[section];
+  } catch {
+    return defaultContent[section];
+  }
 }
 
 export async function updateSiteSection<K extends keyof SiteContent>(

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import type { ProjectDB } from '@/lib/data-access';
@@ -32,11 +32,44 @@ type Props = {
 export default function ProyectoHeader({ currentSlug, projects }: Props) {
   const [open, setOpen] = useState(false);
   const [proyectosOpen, setProyectosOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
 
   function close() {
     setOpen(false);
     setProyectosOpen(false);
   }
+
+  useEffect(() => {
+    if (open) {
+      const first = sidebarRef.current?.querySelector<HTMLElement>('button, a[href]');
+      first?.focus();
+    } else {
+      triggerRef.current?.focus();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key !== 'Tab') return;
+      const sidebar = sidebarRef.current;
+      if (!sidebar) return;
+      const focusable = Array.from(
+        sidebar.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]')
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open]);
 
   return (
     <>
@@ -91,8 +124,11 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
 
           {/* Botón menú */}
           <button
+            ref={triggerRef}
             onClick={() => setOpen(true)}
             aria-label="Abrir menú"
+            aria-expanded={open}
+            aria-controls="proyecto-sidebar"
             style={{
               background: 'none',
               border: 'none',
@@ -131,6 +167,11 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
 
       {/* Sidebar */}
       <aside
+        ref={sidebarRef}
+        id="proyecto-sidebar"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
         style={{
           position: 'fixed',
           top: 0, right: 0, bottom: 0,
@@ -184,6 +225,7 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
               <button
                 onClick={() => setProyectosOpen((v) => !v)}
                 aria-label={proyectosOpen ? 'Colapsar proyectos' : 'Expandir proyectos'}
+                aria-expanded={proyectosOpen}
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   padding: '0 40px 0 8px', color: '#8B6F47', fontSize: '11px', lineHeight: 1,
