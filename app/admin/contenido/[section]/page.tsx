@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import { getSiteSection, type SiteContent } from '@/lib/data-access';
 import ContentSectionForm from '@/components/admin/ContentSectionForm';

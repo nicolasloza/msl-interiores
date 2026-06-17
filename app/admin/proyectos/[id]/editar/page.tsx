@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import ProjectForm from '@/components/admin/ProjectForm';
 import { getProjectById } from '@/lib/data-access';

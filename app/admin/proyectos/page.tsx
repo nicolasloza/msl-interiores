@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import Button from '@mui/material/Button';
@@ -12,8 +14,6 @@ import Paper from '@mui/material/Paper';
 import AddIcon from '@mui/icons-material/Add';
 import { getProjects } from '@/lib/data-access';
 import ProjectRowActions from './ProjectRowActions';
-
-export const dynamic = 'force-dynamic';
 
 export default async function ProyectosAdminPage() {
   const projects = await getProjects();

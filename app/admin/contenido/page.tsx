@@ -1,9 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { getSiteContent } from '@/lib/data-access';
-
-export const dynamic = 'force-dynamic';
 
 const SECTION_LABELS: Record<string, { title: string; description: string }> = {
   hero: { title: 'Hero', description: 'Imagen principal, título, subtítulo y CTA de la pantalla de inicio.' },
