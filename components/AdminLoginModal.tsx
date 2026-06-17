@@ -188,7 +188,7 @@ export default function AdminLoginModal({ open, onClose }: Props) {
                   marginBottom: '6px',
                 }}
               >
-                Email
+                Usuario
               </label>
               <input
                 id="modal-email"
