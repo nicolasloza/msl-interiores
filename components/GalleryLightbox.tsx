@@ -52,6 +52,7 @@ function GalleryItem({
 export default function GalleryLightbox({ images, projectName }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [showAll, setShowAll] = useState(false);
+  const [labelCollapsed, setLabelCollapsed] = useState(true);
 
   // gallery = todas las imágenes excepto el hero (índice 0)
   const gallery = images.slice(1).filter(Boolean);
@@ -118,6 +119,7 @@ export default function GalleryLightbox({ images, projectName }: Props) {
         {/* Sección expandible */}
         {hasMore && (
           <div
+            onTransitionEnd={() => { if (!showAll) setLabelCollapsed(true); }}
             style={{
               overflow: 'hidden',
               maxHeight: showAll ? `${extra.length * 600}px` : '0',
@@ -143,7 +145,15 @@ export default function GalleryLightbox({ images, projectName }: Props) {
         {hasMore && (
           <div style={{ textAlign: 'center', marginTop: '32px' }}>
             <button
-              onClick={() => setShowAll((v) => !v)}
+              onClick={() => {
+                if (showAll) {
+                  setShowAll(false);
+                  // labelCollapsed se actualiza en onTransitionEnd
+                } else {
+                  setShowAll(true);
+                  setLabelCollapsed(false);
+                }
+              }}
               style={{
                 background: 'none',
                 border: '1px solid #2C2420',
@@ -164,7 +174,7 @@ export default function GalleryLightbox({ images, projectName }: Props) {
                 (e.currentTarget as HTMLButtonElement).style.color = '#2C2420';
               }}
             >
-              {showAll ? `Ver menos` : `Ver más — ${extra.length} foto${extra.length > 1 ? 's' : ''}`}
+              {labelCollapsed ? `Ver más — ${extra.length} foto${extra.length > 1 ? 's' : ''}` : `Ver menos`}
             </button>
           </div>
         )}

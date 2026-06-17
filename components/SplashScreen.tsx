@@ -9,20 +9,22 @@ export default function SplashScreen() {
   const [phase, setPhase] = useState<'visible' | 'fading' | 'gone'>('visible');
 
   useEffect(() => {
-    // loading.tsx guarda cuándo empezó la navegación.
-    // Si no existe (hard refresh), usamos Date.now() como referencia.
+    document.body.style.overflow = 'hidden';
+
     const navStart = Number(sessionStorage.getItem('msl-nav-start') || Date.now());
     const elapsed = Date.now() - navStart;
-
-    // Tiempo que falta para cumplir los 5 segundos mínimos
     const remaining = Math.max(0, MIN_MS - elapsed);
 
     const fadeTimer = setTimeout(() => setPhase('fading'), remaining);
-    const goneTimer = setTimeout(() => setPhase('gone'), remaining + FADE_MS);
+    const goneTimer = setTimeout(() => {
+      setPhase('gone');
+      document.body.style.overflow = '';
+    }, remaining + FADE_MS);
 
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(goneTimer);
+      document.body.style.overflow = '';
     };
   }, []);
 
