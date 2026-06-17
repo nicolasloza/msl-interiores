@@ -8,6 +8,11 @@ import GalleryLightbox from '@/components/GalleryLightbox';
 
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  const projects = await getPublishedProjects();
+  return projects.map((p) => ({ slug: p.slug }));
+}
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
