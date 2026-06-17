@@ -1,4 +1,8 @@
-export default function Footer() {
+import { getSiteSection } from '@/lib/data-access';
+
+export default async function Footer() {
+  const { brand, copyright } = await getSiteSection('footer');
+
   return (
     <footer
       style={{
@@ -12,10 +16,10 @@ export default function Footer() {
       }}
     >
       <span className="serif" style={{ color: 'rgba(253,250,245,0.4)', fontSize: '14px' }}>
-        MSL Interiores
+        {brand}
       </span>
       <span style={{ color: 'rgba(253,250,245,0.3)', fontSize: '12px', letterSpacing: '0.05em' }}>
-        © 2024 · Diseño de interiores residencial
+        {copyright}
       </span>
     </footer>
   );

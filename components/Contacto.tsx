@@ -22,6 +22,15 @@ function IconInstagram() {
   );
 }
 
+type ContactoProps = {
+  label: string;
+  title: string;
+  subtitle: string;
+  email: string;
+  instagram: string;
+  instagramUrl: string;
+};
+
 type FormValues = {
   nombre: string;
   email: string;
@@ -29,7 +38,6 @@ type FormValues = {
 };
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
-
 type Status = 'idle' | 'sending' | 'success' | 'error';
 
 function validateEmail(email: string): boolean {
@@ -48,7 +56,7 @@ function validate(values: FormValues): FormErrors {
   return errors;
 }
 
-export default function Contacto() {
+export default function Contacto({ label, title, subtitle, email, instagram, instagramUrl }: ContactoProps) {
   const [values, setValues] = useState<FormValues>({ nombre: '', email: '', mensaje: '' });
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<Status>('idle');
@@ -107,7 +115,7 @@ export default function Contacto() {
               marginBottom: '20px',
             }}
           >
-            Contacto
+            {label}
           </p>
           <h2
             className="serif"
@@ -118,7 +126,7 @@ export default function Contacto() {
               marginBottom: '16px',
             }}
           >
-            Contanos tu proyecto
+            {title}
           </h2>
           <p
             style={{
@@ -129,7 +137,7 @@ export default function Contacto() {
               marginBottom: '56px',
             }}
           >
-            Cada proyecto comienza con una conversación. Escribinos y te respondemos a la brevedad.
+            {subtitle}
           </p>
         </FadeIn>
 
@@ -226,7 +234,7 @@ export default function Contacto() {
             }}
           >
             <a
-              href="mailto:msl.interioresba@gmail.com"
+              href={`mailto:${email}`}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -241,10 +249,10 @@ export default function Contacto() {
               onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(253,250,245,0.55)')}
             >
               <IconMail />
-              msl.interioresba@gmail.com
+              {email}
             </a>
             <a
-              href="https://instagram.com/msl.interiores"
+              href={instagramUrl}
               target="_blank"
               rel="noreferrer"
               style={{
@@ -261,7 +269,7 @@ export default function Contacto() {
               onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(253,250,245,0.55)')}
             >
               <IconInstagram />
-              @msl.interiores
+              {instagram}
             </a>
           </div>
         </FadeIn>

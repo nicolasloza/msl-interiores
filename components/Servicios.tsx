@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import FadeIn from '@/components/FadeIn';
-import { SERVICES, type ServiceIconId } from '@/data/content';
+import { getSiteSection } from '@/lib/data-access';
+import type { ServiceIconId } from '@/data/content';
 
 const SERVICE_ICONS: Record<ServiceIconId, ReactNode> = {
   'proyecto-integral': (
@@ -29,7 +30,9 @@ const SERVICE_ICONS: Record<ServiceIconId, ReactNode> = {
   ),
 };
 
-export default function Servicios() {
+export default async function Servicios() {
+  const { label, title, items } = await getSiteSection('servicios');
+
   return (
     <section id="servicios" style={{ background: '#F0EBE1', padding: '100px 48px' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
@@ -44,7 +47,7 @@ export default function Servicios() {
               textAlign: 'center',
             }}
           >
-            Servicios
+            {label}
           </p>
           <h2
             className="serif"
@@ -55,7 +58,7 @@ export default function Servicios() {
               marginBottom: '64px',
             }}
           >
-            Cómo trabajamos
+            {title}
           </h2>
         </FadeIn>
 
@@ -66,7 +69,7 @@ export default function Servicios() {
             gap: '32px',
           }}
         >
-          {SERVICES.map((s, i) => (
+          {items.map((s, i) => (
             <FadeIn key={s.title} delay={i * 120}>
               <div
                 style={{
@@ -76,7 +79,7 @@ export default function Servicios() {
                 }}
               >
                 <div style={{ color: '#8B6F47', marginBottom: '24px' }}>
-                  {SERVICE_ICONS[s.iconId]}
+                  {SERVICE_ICONS[s.iconId as ServiceIconId]}
                 </div>
                 <h3 className="serif" style={{ fontSize: '22px', fontWeight: 400, marginBottom: '16px' }}>
                   {s.title}

@@ -2,15 +2,23 @@
 
 import Image from 'next/image';
 
+type HeroProps = {
+  label: string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  imagen: string;
+};
+
 function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 }
 
-export default function Hero() {
+export default function Hero({ label, title, subtitle, ctaText, imagen }: HeroProps) {
   return (
     <section id="hero" style={{ position: 'relative', height: '100vh', minHeight: '600px' }}>
       <Image
-        src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1600&q=85"
+        src={imagen}
         alt="Interior"
         fill
         style={{ objectFit: 'cover' }}
@@ -46,7 +54,7 @@ export default function Hero() {
             marginBottom: '24px',
           }}
         >
-          Diseño de interiores residencial
+          {label}
         </p>
         <h1
           className="serif"
@@ -59,9 +67,7 @@ export default function Hero() {
             marginBottom: '20px',
           }}
         >
-          Tu hogar,
-          <br />
-          <em>rediseñado desde adentro</em>
+          {title}
         </h1>
         <p
           style={{
@@ -73,11 +79,10 @@ export default function Hero() {
             marginBottom: '40px',
           }}
         >
-          Transformamos casas en hogares únicos, diseñados desde la escucha y construidos con
-          criterio.
+          {subtitle}
         </p>
         <button className="btn-primary" onClick={() => scrollTo('proyectos')}>
-          Ver proyectos
+          {ctaText}
         </button>
       </div>
 

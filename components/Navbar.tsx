@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useScrolled } from '@/hooks/useScrolled';
-import { PROJECTS } from '@/data/content';
+import type { ProjectDB } from '@/lib/data-access';
+import AdminLoginModal from '@/components/AdminLoginModal';
 
 function IconMail() {
   return (
@@ -29,14 +32,38 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 }
 
-export default function Navbar() {
+type NavbarProps = {
+  projects: ProjectDB[];
+  email?: string;
+  instagram?: string;
+  instagramUrl?: string;
+};
+
+export default function Navbar({
+  projects,
+  email = 'msl.interioresba@gmail.com',
+  instagram = '@msl.interiores',
+  instagramUrl = 'https://instagram.com/msl.interiores',
+}: NavbarProps) {
   const scrolled = useScrolled();
+  const router = useRouter();
+  const { status } = useSession();
   const [open, setOpen] = useState(false);
   const [proyectosOpen, setProyectosOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   function close() {
     setOpen(false);
     setProyectosOpen(false);
+  }
+
+  function handleDashboardClick() {
+    close();
+    if (status === 'authenticated') {
+      router.push('/admin');
+    } else {
+      setLoginModalOpen(true);
+    }
   }
 
   return (
@@ -220,12 +247,12 @@ export default function Navbar() {
             <div
               style={{
                 overflow: 'hidden',
-                maxHeight: proyectosOpen ? `${PROJECTS.length * 72}px` : '0',
+                maxHeight: proyectosOpen ? `${projects.length * 72}px` : '0',
                 transition: 'max-height 0.4s ease',
                 background: '#F7F3ED',
               }}
             >
-              {PROJECTS.map((p) => (
+              {projects.map((p) => (
                 <Link
                   key={p.slug}
                   href={`/proyectos/${p.slug}`}
@@ -265,7 +292,44 @@ export default function Navbar() {
 
           <SidebarLink label="Proceso" onClick={() => { scrollTo('proceso'); close(); }} />
           <SidebarLink label="Contacto" onClick={() => { scrollTo('contacto'); close(); }} />
+
         </nav>
+
+        {/* Dashboard */}
+        <div
+          style={{
+            borderTop: '1px solid #EDE8E0',
+            padding: '20px 40px',
+            flexShrink: 0,
+          }}
+        >
+          <button
+            onClick={handleDashboardClick}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '11px',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'rgba(44,36,32,0.35)',
+              transition: 'color 0.2s',
+              fontFamily: 'var(--font-inter), sans-serif',
+            }}
+            onMouseOver={(e) => ((e.currentTarget as HTMLButtonElement).style.color = '#8B6F47')}
+            onMouseOut={(e) => ((e.currentTarget as HTMLButtonElement).style.color = 'rgba(44,36,32,0.35)')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: '13px', height: '13px', flexShrink: 0 }}>
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Dashboard
+          </button>
+        </div>
 
         {/* Pie del sidebar */}
         <div
@@ -276,7 +340,7 @@ export default function Navbar() {
           }}
         >
           <a
-            href="mailto:msl.interioresba@gmail.com"
+            href={`mailto:${email}`}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -289,10 +353,10 @@ export default function Navbar() {
             }}
           >
             <IconMail />
-            msl.interioresba@gmail.com
+            {email}
           </a>
           <a
-            href="https://instagram.com/msl.interiores"
+            href={instagramUrl}
             target="_blank"
             rel="noreferrer"
             style={{
@@ -306,10 +370,15 @@ export default function Navbar() {
             }}
           >
             <IconInstagram />
-            @msl.interiores
+            {instagram}
           </a>
         </div>
       </aside>
+
+      <AdminLoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+      />
     </>
   );
 }

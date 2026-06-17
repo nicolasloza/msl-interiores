@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String   @default("Administrador")
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id            Int            @id @default(autoincrement())
+  slug          String         @unique
+  name          String
+  category      String         @default("Residencial")
+  location      String         @default("")
+  year          Int
+  img           String
+  superficie    Float          @default(0)
+  tipo          String         @default("Proyecto integral")
+  duracion      String         @default("")
+  piso          String         @default("")
+  revestimiento String         @default("")
+  paleta        String         @default("")
+  desafio       String         @default("")
+  propuesta     String         @default("")
+  resultado     String         @default("")
+  publicado     Boolean        @default(true)
+  orden         Int            @default(999)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  images        ProjectImage[]
+}
+
+model ProjectImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  orden     Int     @default(0)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int
+}
+
+model SiteContent {
+  id        Int      @id @default(autoincrement())
+  section   String   @unique
+  data      Json
+  updatedAt DateTime @updatedAt @default(now())
+}

@@ -3,11 +3,20 @@
 import Image from 'next/image';
 import FadeIn from '@/components/FadeIn';
 
+type NosotrosProps = {
+  label: string;
+  title: string;
+  parrafo1: string;
+  parrafo2: string;
+  ctaText: string;
+  imagen: string;
+};
+
 function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 }
 
-export default function Nosotros() {
+export default function Nosotros({ label, title, parrafo1, parrafo2, ctaText, imagen }: NosotrosProps) {
   return (
     <section id="nosotros" style={{ padding: '100px 48px', maxWidth: '1100px', margin: '0 auto' }}>
       <div
@@ -28,7 +37,7 @@ export default function Nosotros() {
               marginBottom: '24px',
             }}
           >
-            El estudio
+            {label}
           </p>
           <h2
             className="serif"
@@ -39,9 +48,7 @@ export default function Nosotros() {
               marginBottom: '24px',
             }}
           >
-            Diseñamos desde
-            <br />
-            la escucha
+            {title}
           </h2>
           <div className="divider" />
           <p
@@ -53,9 +60,7 @@ export default function Nosotros() {
               marginBottom: '20px',
             }}
           >
-            En MSL Interiores creemos que cada hogar es el reflejo de quien lo habita. Por eso,
-            antes de trazar una línea, nos tomamos el tiempo de entender cómo vivís, qué te genera
-            bienestar y qué historia querés que cuente tu espacio.
+            {parrafo1}
           </p>
           <p
             style={{
@@ -66,18 +71,17 @@ export default function Nosotros() {
               marginBottom: '40px',
             }}
           >
-            Trabajamos proyectos residenciales integrales con un enfoque artesanal: atención al
-            detalle, materialidad cuidada y un proceso cercano de principio a fin.
+            {parrafo2}
           </p>
           <button className="btn-dark" onClick={() => scrollTo('contacto')}>
-            Hablemos de tu proyecto
+            {ctaText}
           </button>
         </FadeIn>
 
         <FadeIn delay={150}>
           <div style={{ position: 'relative' }}>
             <Image
-              src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=800&q=80"
+              src={imagen}
               alt="Detalle de diseño"
               width={800}
               height={1067}

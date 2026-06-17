@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { PROJECTS } from '@/data/content';
+import type { ProjectDB } from '@/lib/data-access';
 
 function IconMail() {
   return (
@@ -24,7 +24,12 @@ function IconInstagram() {
   );
 }
 
-export default function ProyectoHeader({ currentSlug }: { currentSlug: string }) {
+type Props = {
+  currentSlug: string;
+  projects: ProjectDB[];
+};
+
+export default function ProyectoHeader({ currentSlug, projects }: Props) {
   const [open, setOpen] = useState(false);
   const [proyectosOpen, setProyectosOpen] = useState(false);
 
@@ -151,29 +156,13 @@ export default function ProyectoHeader({ currentSlug }: { currentSlug: string })
             flexShrink: 0,
           }}
         >
-          <span
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              color: '#8B6F47',
-            }}
-          >
+          <span style={{ fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8B6F47' }}>
             Menú
           </span>
           <button
             onClick={close}
             aria-label="Cerrar menú"
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '22px',
-              color: '#2C2420',
-              lineHeight: 1,
-              padding: '4px',
-              opacity: 0.6,
-            }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '22px', color: '#2C2420', lineHeight: 1, padding: '4px', opacity: 0.6 }}
           >
             ✕
           </button>
@@ -195,15 +184,9 @@ export default function ProyectoHeader({ currentSlug }: { currentSlug: string })
                 onClick={() => setProyectosOpen((v) => !v)}
                 aria-label={proyectosOpen ? 'Colapsar proyectos' : 'Expandir proyectos'}
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0 40px 0 8px',
-                  color: '#8B6F47',
-                  fontSize: '11px',
-                  lineHeight: 1,
-                  flexShrink: 0,
-                  transform: proyectosOpen ? 'rotate(180deg)' : 'none',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  padding: '0 40px 0 8px', color: '#8B6F47', fontSize: '11px', lineHeight: 1,
+                  flexShrink: 0, transform: proyectosOpen ? 'rotate(180deg)' : 'none',
                   transition: 'transform 0.3s ease',
                 }}
               >
@@ -214,41 +197,28 @@ export default function ProyectoHeader({ currentSlug }: { currentSlug: string })
             <div
               style={{
                 overflow: 'hidden',
-                maxHeight: proyectosOpen ? `${PROJECTS.length * 72}px` : '0',
+                maxHeight: proyectosOpen ? `${projects.length * 72}px` : '0',
                 transition: 'max-height 0.4s ease',
                 background: '#F7F3ED',
               }}
             >
-              {PROJECTS.map((p) => (
+              {projects.map((p) => (
                 <Link
                   key={p.slug}
                   href={`/proyectos/${p.slug}`}
                   onClick={close}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '16px 40px 16px 56px',
-                    borderBottom: '1px solid #EDE8E0',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '16px 40px 16px 56px', borderBottom: '1px solid #EDE8E0',
                     textDecoration: 'none',
                     background: p.slug === currentSlug ? '#EDE8E0' : 'transparent',
                     transition: 'background 0.2s',
                   }}
                   onMouseOver={(e) => (e.currentTarget.style.background = '#EDE8E0')}
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.background =
-                      p.slug === currentSlug ? '#EDE8E0' : 'transparent')
-                  }
+                  onMouseOut={(e) => (e.currentTarget.style.background = p.slug === currentSlug ? '#EDE8E0' : 'transparent')}
                 >
                   <div>
-                    <p
-                      style={{
-                        fontSize: '15px',
-                        color: '#2C2420',
-                        fontWeight: p.slug === currentSlug ? 500 : 400,
-                        fontFamily: 'var(--font-playfair), serif',
-                      }}
-                    >
+                    <p style={{ fontSize: '15px', color: '#2C2420', fontWeight: p.slug === currentSlug ? 500 : 400, fontFamily: 'var(--font-playfair), serif' }}>
                       {p.name}
                     </p>
                     <p style={{ fontSize: '11px', color: '#8B6F47', marginTop: '3px', letterSpacing: '0.05em' }}>
@@ -270,19 +240,11 @@ export default function ProyectoHeader({ currentSlug }: { currentSlug: string })
 
         {/* Pie */}
         <div style={{ padding: '28px 40px', borderTop: '1px solid #EDE8E0', flexShrink: 0 }}>
-          <a
-            href="mailto:msl.interioresba@gmail.com"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#8B6F47', textDecoration: 'none', letterSpacing: '0.05em', marginBottom: '10px' }}
-          >
+          <a href="mailto:msl.interioresba@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#8B6F47', textDecoration: 'none', letterSpacing: '0.05em', marginBottom: '10px' }}>
             <IconMail />
             msl.interioresba@gmail.com
           </a>
-          <a
-            href="https://instagram.com/msl.interiores"
-            target="_blank"
-            rel="noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#8B6F47', textDecoration: 'none', letterSpacing: '0.05em' }}
-          >
+          <a href="https://instagram.com/msl.interiores" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#8B6F47', textDecoration: 'none', letterSpacing: '0.05em' }}>
             <IconInstagram />
             @msl.interiores
           </a>

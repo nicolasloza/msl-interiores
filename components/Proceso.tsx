@@ -1,7 +1,9 @@
 import FadeIn from '@/components/FadeIn';
-import { STEPS } from '@/data/content';
+import { getSiteSection } from '@/lib/data-access';
 
-export default function Proceso() {
+export default async function Proceso() {
+  const { label, title, steps } = await getSiteSection('proceso');
+
   return (
     <section id="proceso" style={{ background: '#2C2420', padding: '100px 48px' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
@@ -16,7 +18,7 @@ export default function Proceso() {
               textAlign: 'center',
             }}
           >
-            Proceso
+            {label}
           </p>
           <h2
             className="serif"
@@ -28,7 +30,7 @@ export default function Proceso() {
               marginBottom: '72px',
             }}
           >
-            Así es trabajar con nosotras
+            {title}
           </h2>
         </FadeIn>
 
@@ -40,7 +42,7 @@ export default function Proceso() {
             position: 'relative',
           }}
         >
-          {STEPS.map((step, i) => (
+          {steps.map((step, i) => (
             <FadeIn key={step.num} delay={i * 100}>
               <div>
                 <p

@@ -1,9 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeIn from '@/components/FadeIn';
-import { PROJECTS } from '@/data/content';
+import { getPublishedProjects } from '@/lib/data-access';
 
-export default function Proyectos() {
+export default async function Proyectos() {
+  const PROJECTS = await getPublishedProjects();
   return (
     <section id="proyectos" style={{ padding: '100px 48px' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>

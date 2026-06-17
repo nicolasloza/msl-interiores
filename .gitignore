@@ -13,3 +13,8 @@ out/
 # Misc
 .DS_Store
 *.pem
+
+.vercel
+
+# Base de datos local del admin (opcional: quitar si querés versionar el contenido)
+# data/db/

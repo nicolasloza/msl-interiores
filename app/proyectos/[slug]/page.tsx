@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { PROJECTS } from '@/data/content';
+import { getPublishedProjects, getProjectBySlug } from '@/lib/data-access';
 import ProyectoHeader from '@/components/ProyectoHeader';
 
 type PageProps = {
@@ -10,12 +10,13 @@ type PageProps = {
 };
 
 export async function generateStaticParams() {
-  return PROJECTS.map((p) => ({ slug: p.slug }));
+  const projects = await getPublishedProjects();
+  return projects.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = PROJECTS.find((p) => p.slug === slug);
+  const project = await getProjectBySlug(slug);
   if (!project) return {};
   return {
     title: `${project.name} | MSL Interiores`,
@@ -25,9 +26,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProyectoPage({ params }: PageProps) {
   const { slug } = await params;
-  const project = PROJECTS.find((p) => p.slug === slug);
+  const project = await getProjectBySlug(slug);
   if (!project) notFound();
 
+  const PROJECTS = await getPublishedProjects();
   const currentIndex = PROJECTS.findIndex((p) => p.slug === slug);
   const prev = currentIndex > 0 ? PROJECTS[currentIndex - 1] : null;
   const next = currentIndex < PROJECTS.length - 1 ? PROJECTS[currentIndex + 1] : null;
@@ -52,7 +54,7 @@ export default async function ProyectoPage({ params }: PageProps) {
         .gallery-item:hover img { transform: scale(1.04); }
       `}</style>
 
-      <ProyectoHeader currentSlug={project.slug} />
+      <ProyectoHeader currentSlug={project.slug} projects={PROJECTS} />
 
       {/* Hero */}
       <div style={{ position: 'relative', height: '70vh', minHeight: '480px' }}>

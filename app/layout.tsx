@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Playfair_Display, Inter } from 'next/font/google';
+import Providers from '@/components/Providers';
+import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -31,7 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           color: '#2C2420',
         }}
       >
-        {children}
+        <NextTopLoader color="#8B6F47" shadow={false} height={2} showSpinner={false} />
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
