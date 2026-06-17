@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import Divider from '@mui/material/Divider';
+import Skeleton from '@mui/material/Skeleton';
 import GalleryManager from './GalleryManager';
 import CloudinaryUploadButton from './CloudinaryUploadButton';
 import type { ProjectDB } from '@/lib/data-access';
@@ -93,6 +94,10 @@ export default function ProjectForm({ initialData, projectId, mode }: Props) {
   const [snack, setSnack] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false, message: '', severity: 'success',
   });
+  const [loadedImgs, setLoadedImgs] = useState<Set<string>>(new Set());
+  const markImgLoaded = useCallback((url: string) => {
+    setLoadedImgs((prev) => new Set([...prev, url]));
+  }, []);
 
   function set<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -186,12 +191,24 @@ export default function ProjectForm({ initialData, projectId, mode }: Props) {
         <div style={{
           width: '160px', aspectRatio: '4/3', flexShrink: 0,
           border: '1px solid #EDE8E0', background: '#F0EBE1',
+          position: 'relative',
           display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
         }}>
-          {form.img
-            ? <img src={form.img} alt="Principal" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> // eslint-disable-line @next/next/no-img-element
-            : <span style={{ fontSize: '11px', color: '#8B6F47', letterSpacing: '0.06em' }}>Sin imagen</span>
-          }
+          {form.img ? (
+            <>
+              {!loadedImgs.has(form.img) && (
+                <Skeleton variant="rectangular" sx={{ position: 'absolute', inset: 0, zIndex: 1, transform: 'none' }} />
+              )}
+              <img // eslint-disable-line @next/next/no-img-element
+                src={form.img}
+                alt="Principal"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onLoad={() => markImgLoaded(form.img)}
+              />
+            </>
+          ) : (
+            <span style={{ fontSize: '11px', color: '#8B6F47', letterSpacing: '0.06em' }}>Sin imagen</span>
+          )}
         </div>
 
         <div style={{ flex: 1, minWidth: '200px' }}>
@@ -218,13 +235,17 @@ export default function ProjectForm({ initialData, projectId, mode }: Props) {
                       width: '56px', height: '42px', padding: 0, cursor: 'pointer',
                       border: form.img === url ? '2px solid #8B6F47' : '1px solid #EDE8E0',
                       overflow: 'hidden', flexShrink: 0, background: 'none',
+                      position: 'relative',
                       opacity: form.img === url ? 1 : 0.75,
                       transition: 'opacity 0.15s, border-color 0.15s',
                     }}
                     onMouseOver={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
                     onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = form.img === url ? '1' : '0.75'; }}
                   >
-                    <img src={url} alt={`img ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> {/* eslint-disable-line @next/next/no-img-element */}
+                    {!loadedImgs.has(url) && (
+                      <Skeleton variant="rectangular" sx={{ position: 'absolute', inset: 0, zIndex: 1, transform: 'none' }} />
+                    )}
+                    <img src={url} alt={`img ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onLoad={() => markImgLoaded(url)} /> {/* eslint-disable-line @next/next/no-img-element */}
                   </button>
                 ))}
               </div>

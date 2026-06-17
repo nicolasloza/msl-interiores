@@ -47,6 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <style>{`
         @media (max-width: 899px) {
           .admin-sidebar-desktop-wrapper { display: none; }
+          .admin-sidebar-desktop { display: none; }
         }
       `}</style>
     </AdminThemeProvider>

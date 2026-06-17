@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
+import Skeleton from '@mui/material/Skeleton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -20,6 +21,11 @@ type Props = {
 export default function GalleryManager({ images, onChange, slug = '' }: Props) {
   const [newUrl, setNewUrl] = useState('');
   const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [loadedUrls, setLoadedUrls] = useState<Set<string>>(new Set());
+
+  function markLoaded(url: string) {
+    setLoadedUrls((prev) => new Set([...prev, url]));
+  }
 
   function addImage() {
     const url = newUrl.trim();
@@ -83,12 +89,19 @@ export default function GalleryManager({ images, onChange, slug = '' }: Props) {
                 transition: 'opacity 0.2s',
               }}
             >
+              {!loadedUrls.has(src) && (
+                <Skeleton
+                  variant="rectangular"
+                  sx={{ position: 'absolute', inset: 0, zIndex: 1, transform: 'none' }}
+                />
+              )}
               <Image
                 src={src}
                 alt={`Imagen ${idx + 1}`}
                 fill
                 style={{ objectFit: 'cover' }}
                 sizes="120px"
+                onLoad={() => markLoaded(src)}
               />
               <div
                 style={{

@@ -186,7 +186,6 @@ export default function AdminSidebar({ mobileOpen, onMobileClose }: Props) {
         onClose={onMobileClose}
         ModalProps={{ keepMounted: true }}
         sx={{
-          display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': { width: SIDEBAR_WIDTH },
         }}
       >
