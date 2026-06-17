@@ -21,6 +21,7 @@ export default function Hero({ label, title, subtitle, ctaText, imagen }: HeroPr
         src={imagen}
         alt="Interior"
         fill
+        sizes="100vw"
         style={{ objectFit: 'cover' }}
         priority
       />

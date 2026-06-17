@@ -6,7 +6,7 @@ import { getPublishedProjects, getProjectBySlug } from '@/lib/data-access';
 import ProyectoHeader from '@/components/ProyectoHeader';
 import GalleryLightbox from '@/components/GalleryLightbox';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -60,6 +60,7 @@ export default async function ProyectoPage({ params }: PageProps) {
           src={hero}
           alt={project.name}
           fill
+          sizes="100vw"
           style={{ objectFit: 'cover' }}
           priority
         />
@@ -68,12 +69,7 @@ export default async function ProyectoPage({ params }: PageProps) {
           inset: 0,
           background: 'linear-gradient(to bottom, transparent 50%, rgba(44,36,32,0.5) 100%)',
         }} />
-        <div style={{
-          position: 'absolute',
-          bottom: '48px',
-          left: '48px',
-          right: '48px',
-        }}>
+        <div className="proyecto-hero-caption">
           <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '12px' }}>
             {project.category} · {project.location} · {project.year}
           </p>
@@ -85,13 +81,7 @@ export default async function ProyectoPage({ params }: PageProps) {
 
       {/* Ficha técnica */}
       <section style={{ borderBottom: '1px solid #EDE8E0' }}>
-        <div style={{
-          maxWidth: '1100px',
-          margin: '0 auto',
-          padding: '0 48px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        }}>
+        <div className="proyecto-ficha-pad">
           {[
             { label: 'Superficie', value: `${project.superficie} m²` },
             { label: 'Tipo de proyecto', value: project.tipo },
@@ -113,7 +103,7 @@ export default async function ProyectoPage({ params }: PageProps) {
       </section>
 
       {/* Descripción */}
-      <section style={{ padding: '80px 48px' }}>
+      <section className="proyecto-desc-pad">
         <div style={{
           maxWidth: '1100px',
           margin: '0 auto',
@@ -151,13 +141,7 @@ export default async function ProyectoPage({ params }: PageProps) {
 
       {/* Navegación anterior / siguiente */}
       <nav style={{ borderTop: '1px solid #EDE8E0' }}>
-        <div style={{
-          maxWidth: '1100px',
-          margin: '0 auto',
-          padding: '0 48px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-        }}>
+        <div className="proyecto-nav-pad">
           <div style={{ borderRight: '1px solid #EDE8E0', padding: '40px 40px 40px 0' }}>
             {prev ? (
               <Link href={`/proyectos/${prev.slug}`} className="proj-nav-link">

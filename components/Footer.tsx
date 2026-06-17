@@ -1,13 +1,12 @@
-import { getSiteSection } from '@/lib/data-access';
+type Props = { brand: string; copyright: string };
 
-export default async function Footer() {
-  const { brand, copyright } = await getSiteSection('footer');
+export default function Footer({ brand, copyright }: Props) {
 
   return (
     <footer
       style={{
         background: '#2C2420',
-        padding: '24px 48px',
+        padding: '24px clamp(20px, 4vw, 48px)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',

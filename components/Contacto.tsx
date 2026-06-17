@@ -103,7 +103,7 @@ export default function Contacto({ label, title, subtitle, email, instagram, ins
   }
 
   return (
-    <section id="contacto" style={{ padding: '100px 48px', background: '#3D2E28' }}>
+    <section id="contacto" className="section-pad" style={{ background: '#3D2E28' }}>
       <div style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
         <FadeIn>
           <p
@@ -157,7 +157,7 @@ export default function Contacto({ label, title, subtitle, email, instagram, ins
               noValidate
               style={{ display: 'flex', flexDirection: 'column', gap: '32px', textAlign: 'left' }}
             >
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div className="form-row">
                 <div>
                   <input
                     type="text"

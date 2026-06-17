@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { getProjects, createProject } from '@/lib/data-access';
 import type { ProjectDB } from '@/lib/data-access';
@@ -50,6 +51,7 @@ export async function POST(request: Request) {
       orden: body.orden ?? 999,
     });
 
+    revalidatePath('/', 'layout');
     return Response.json({ project }, { status: 201 });
   } catch (err) {
     console.error(err);

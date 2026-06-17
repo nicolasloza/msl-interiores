@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 import Navbar from '@/components/Navbar';
 import SplashScreen from '@/components/SplashScreen';
@@ -28,11 +28,11 @@ export default async function Page() {
       />
       <Hero {...content.hero} />
       <Nosotros {...content.nosotros} />
-      <Servicios />
-      <Proyectos />
-      <Proceso />
+      <Servicios {...content.servicios} />
+      <Proyectos projects={projects} />
+      <Proceso {...content.proceso} />
       <Contacto {...content.contacto} />
-      <Footer />
+      <Footer {...content.footer} />
     </>
   );
 }

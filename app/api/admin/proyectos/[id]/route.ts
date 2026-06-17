@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { getProjectById, updateProject, deleteProject } from '@/lib/data-access';
 import type { ProjectDB } from '@/lib/data-access';
@@ -27,6 +28,7 @@ export async function PUT(request: Request, { params }: Params) {
     const body = await request.json() as Partial<ProjectDB>;
     const updated = await updateProject(Number(id), body);
     if (!updated) return Response.json({ error: 'Proyecto no encontrado' }, { status: 404 });
+    revalidatePath('/', 'layout');
     return Response.json({ project: updated });
   } catch (err) {
     console.error(err);
@@ -41,5 +43,6 @@ export async function DELETE(_req: Request, { params }: Params) {
   const { id } = await params;
   const deleted = await deleteProject(Number(id));
   if (!deleted) return Response.json({ error: 'Proyecto no encontrado' }, { status: 404 });
+  revalidatePath('/', 'layout');
   return Response.json({ ok: true });
 }

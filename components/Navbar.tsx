@@ -235,7 +235,7 @@ export default function Navbar({
                   fontSize: '11px',
                   lineHeight: 1,
                   flexShrink: 0,
-                  transform: proyectosOpen ? 'rotate(180deg)' : 'none',
+                  transform: proyectosOpen ? 'scaleY(-1)' : 'scaleY(1)',
                   transition: 'transform 0.3s ease',
                 }}
               >

@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { getSiteSection, updateSiteSection, type SiteContent } from '@/lib/data-access';
 
@@ -36,6 +37,7 @@ export async function PUT(request: Request, { params }: Params) {
   try {
     const body = await request.json();
     await updateSiteSection(section as keyof SiteContent, body);
+    revalidatePath('/', 'layout');
     return Response.json({ ok: true });
   } catch (err) {
     console.error(err);

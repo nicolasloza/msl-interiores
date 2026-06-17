@@ -47,12 +47,12 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
           zIndex: 100,
           background: '#FDFAF5',
           borderBottom: '1px solid #EDE8E0',
-          padding: '0 48px',
+          padding: '0 clamp(16px, 4vw, 48px)',
           height: '72px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '24px',
+          gap: '16px',
         }}
       >
         <Link
@@ -73,6 +73,7 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
           <Link
             href="/#proyectos"
+            className="hide-mobile"
             style={{
               fontSize: '11px',
               letterSpacing: '0.1em',
@@ -186,7 +187,7 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   padding: '0 40px 0 8px', color: '#8B6F47', fontSize: '11px', lineHeight: 1,
-                  flexShrink: 0, transform: proyectosOpen ? 'rotate(180deg)' : 'none',
+                  flexShrink: 0, transform: proyectosOpen ? 'scaleY(-1)' : 'scaleY(1)',
                   transition: 'transform 0.3s ease',
                 }}
               >

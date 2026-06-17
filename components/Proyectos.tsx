@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeIn from '@/components/FadeIn';
-import { getPublishedProjects } from '@/lib/data-access';
+import type { ProjectDB } from '@/lib/data-access';
 
-export default async function Proyectos() {
-  const PROJECTS = await getPublishedProjects();
+type Props = { projects: ProjectDB[] };
+
+export default function Proyectos({ projects: PROJECTS }: Props) {
   return (
-    <section id="proyectos" style={{ padding: '100px 48px' }}>
+    <section id="proyectos" className="section-pad">
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <FadeIn>
           <p
@@ -42,13 +43,7 @@ export default async function Proyectos() {
           </div>
         </FadeIn>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '24px',
-          }}
-        >
+        <div className="proyectos-grid">
           {PROJECTS.map((p, i) => (
             <FadeIn key={p.id} delay={i * 80}>
               <Link

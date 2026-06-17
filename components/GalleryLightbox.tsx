@@ -19,31 +19,23 @@ function GalleryItem({
   src,
   alt,
   aspectRatio,
+  sizes,
   onClick,
 }: {
   src: string;
   alt: string;
   aspectRatio: string;
+  sizes: string;
   onClick: () => void;
 }) {
   return (
     <div
       onClick={onClick}
-      style={{
-        position: 'relative',
-        aspectRatio,
-        overflow: 'hidden',
-        cursor: 'zoom-in',
-      }}
+      style={{ position: 'relative', aspectRatio, overflow: 'hidden', cursor: 'zoom-in' }}
     >
-      <Image src={src} alt={alt} fill style={{ objectFit: 'cover', transition: 'transform 0.6s ease' }} />
+      <Image src={src} alt={alt} fill sizes={sizes} style={{ objectFit: 'cover', transition: 'transform 0.6s ease' }} />
       <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'rgba(44,36,32,0)',
-          transition: 'background 0.3s',
-        }}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(44,36,32,0)', transition: 'background 0.3s' }}
         onMouseOver={(e) => {
           (e.currentTarget.previousElementSibling as HTMLImageElement).style.transform = 'scale(1.04)';
           e.currentTarget.style.background = 'rgba(44,36,32,0.08)';
@@ -57,82 +49,125 @@ function GalleryItem({
   );
 }
 
-export default function GalleryLightbox({ images, projectName, superficie, tipo }: Props) {
+export default function GalleryLightbox({ images, projectName }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState(-1);
+  const [showAll, setShowAll] = useState(false);
 
   // gallery = todas las imágenes excepto el hero (índice 0)
   const gallery = images.slice(1).filter(Boolean);
   const slides = gallery.map((src) => ({ src }));
 
-  const [g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11] = gallery;
+  const preview = gallery.slice(0, 4);
+  const extra = gallery.slice(4);
+  const hasMore = extra.length > 0;
 
   return (
     <>
-      <section style={{ padding: '0 48px 80px', maxWidth: '1100px', margin: '0 auto' }}>
+      <section className="proyecto-gallery-pad">
 
-        {/* Fila 1: 2 columnas */}
-        {(g1 || g2) && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-            {g1 && <GalleryItem src={g1} alt={`${projectName} — detalle 1`} aspectRatio="4/3" onClick={() => setLightboxIndex(0)} />}
-            {g2 && <GalleryItem src={g2} alt={`${projectName} — detalle 2`} aspectRatio="4/3" onClick={() => setLightboxIndex(1)} />}
-          </div>
-        )}
-
-        {/* Fila 2: imagen ancha */}
-        {g3 && (
+        {/* img1 — ancho completo */}
+        {preview[0] && (
           <div style={{ marginBottom: '12px' }}>
-            <GalleryItem src={g3} alt={`${projectName} — vista general`} aspectRatio="16/7" onClick={() => setLightboxIndex(2)} />
+            <GalleryItem
+              src={preview[0]}
+              alt={`${projectName} — 1`}
+              aspectRatio="16/9"
+              sizes="(max-width: 768px) 100vw, min(1100px, 100vw)"
+              onClick={() => setLightboxIndex(0)}
+            />
           </div>
         )}
 
-        {/* Fila 3: 3 columnas */}
-        {(g4 || g5 || g6) && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-            {g4 && <GalleryItem src={g4} alt={`${projectName} — detalle 4`} aspectRatio="3/4" onClick={() => setLightboxIndex(3)} />}
-            {g5 && <GalleryItem src={g5} alt={`${projectName} — detalle 5`} aspectRatio="3/4" onClick={() => setLightboxIndex(4)} />}
-            {g6 && <GalleryItem src={g6} alt={`${projectName} — detalle 6`} aspectRatio="3/4" onClick={() => setLightboxIndex(5)} />}
-          </div>
-        )}
-
-        {/* Fila 4: 3 columnas */}
-        {(g7 || g8 || g9) && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-            {g7 && <GalleryItem src={g7} alt={`${projectName} — detalle 7`} aspectRatio="4/3" onClick={() => setLightboxIndex(6)} />}
-            {g8 && <GalleryItem src={g8} alt={`${projectName} — detalle 8`} aspectRatio="4/3" onClick={() => setLightboxIndex(7)} />}
-            {g9 && <GalleryItem src={g9} alt={`${projectName} — detalle 9`} aspectRatio="4/3" onClick={() => setLightboxIndex(8)} />}
-          </div>
-        )}
-
-        {/* Fila 5: 2 imágenes + celda de datos */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-          {g10 && <GalleryItem src={g10} alt={`${projectName} — detalle 10`} aspectRatio="3/4" onClick={() => setLightboxIndex(9)} />}
-          {g11 && <GalleryItem src={g11} alt={`${projectName} — detalle 11`} aspectRatio="3/4" onClick={() => setLightboxIndex(10)} />}
-          <div style={{
-            background: '#2C2420',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: '40px',
-            aspectRatio: '3/4',
-          }}>
-            {superficie && superficie > 0 ? (
-              <>
-                <p style={{ color: 'rgba(212,197,169,0.4)', fontSize: '56px', fontWeight: 400, lineHeight: 1, marginBottom: '24px', fontFamily: 'var(--font-playfair), serif' }}>
-                  {superficie}
-                </p>
-                <p style={{ color: 'rgba(253,250,245,0.4)', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '8px' }}>
-                  metros cuadrados
-                </p>
-                <div style={{ width: '32px', height: '1px', background: 'rgba(212,197,169,0.3)', margin: '20px 0' }} />
-              </>
-            ) : null}
-            {tipo && (
-              <p style={{ color: 'rgba(253,250,245,0.55)', fontSize: '13px', fontWeight: 300, lineHeight: 1.6 }}>
-                {tipo}
-              </p>
+        {/* img2 + img3 — dos columnas */}
+        {(preview[1] || preview[2]) && (
+          <div className="gallery-grid-2">
+            {preview[1] && (
+              <GalleryItem
+                src={preview[1]}
+                alt={`${projectName} — 2`}
+                aspectRatio="4/3"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                onClick={() => setLightboxIndex(1)}
+              />
+            )}
+            {preview[2] && (
+              <GalleryItem
+                src={preview[2]}
+                alt={`${projectName} — 3`}
+                aspectRatio="4/3"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                onClick={() => setLightboxIndex(2)}
+              />
             )}
           </div>
-        </div>
+        )}
+
+        {/* img4 — ancho completo */}
+        {preview[3] && (
+          <div style={{ marginTop: '12px' }}>
+            <GalleryItem
+              src={preview[3]}
+              alt={`${projectName} — 4`}
+              aspectRatio="16/9"
+              sizes="(max-width: 768px) 100vw, min(1100px, 100vw)"
+              onClick={() => setLightboxIndex(3)}
+            />
+          </div>
+        )}
+
+        {/* Sección expandible */}
+        {hasMore && (
+          <div
+            style={{
+              overflow: 'hidden',
+              maxHeight: showAll ? `${extra.length * 600}px` : '0',
+              transition: 'max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            <div className="gallery-extra-grid" style={{ marginTop: '12px' }}>
+              {extra.map((src, i) => (
+                <GalleryItem
+                  key={src}
+                  src={src}
+                  alt={`${projectName} — ${i + 5}`}
+                  aspectRatio="4/3"
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  onClick={() => setLightboxIndex(i + 4)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Botón Ver más / Ver menos */}
+        {hasMore && (
+          <div style={{ textAlign: 'center', marginTop: '32px' }}>
+            <button
+              onClick={() => setShowAll((v) => !v)}
+              style={{
+                background: 'none',
+                border: '1px solid #2C2420',
+                color: '#2C2420',
+                fontSize: '11px',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                padding: '14px 36px',
+                cursor: 'pointer',
+                transition: 'background 0.2s, color 0.2s',
+              }}
+              onMouseOver={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = '#2C2420';
+                (e.currentTarget as HTMLButtonElement).style.color = '#FDFAF5';
+              }}
+              onMouseOut={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'none';
+                (e.currentTarget as HTMLButtonElement).style.color = '#2C2420';
+              }}
+            >
+              {showAll ? `Ver menos` : `Ver más — ${extra.length} foto${extra.length > 1 ? 's' : ''}`}
+            </button>
+          </div>
+        )}
 
       </section>
 

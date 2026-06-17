@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import type { Project, Service, Step } from '@/data/content';
 import { PROJECTS, SERVICES, STEPS } from '@/data/content';
 import { prisma } from '@/lib/prisma';
@@ -112,7 +113,7 @@ export async function getProjects(): Promise<ProjectDB[]> {
   return rows.map(mapProject);
 }
 
-export async function getPublishedProjects(): Promise<ProjectDB[]> {
+export const getPublishedProjects = cache(async (): Promise<ProjectDB[]> => {
   if (!isDbConfigured()) {
     return PROJECTS.map((p, i) => ({ ...p, publicado: true, orden: i + 1 }));
   }
@@ -123,9 +124,9 @@ export async function getPublishedProjects(): Promise<ProjectDB[]> {
     include: { images: true },
   });
   return rows.map(mapProject);
-}
+});
 
-export async function getProjectBySlug(slug: string): Promise<ProjectDB | null> {
+export const getProjectBySlug = cache(async (slug: string): Promise<ProjectDB | null> => {
   if (!isDbConfigured()) {
     const p = PROJECTS.find((p) => p.slug === slug);
     return p ? { ...p, publicado: true, orden: 1 } : null;
@@ -136,7 +137,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDB | null> 
     include: { images: true },
   });
   return row ? mapProject(row) : null;
-}
+});
 
 export async function getProjectById(id: number): Promise<ProjectDB | null> {
   if (!isDbConfigured()) {

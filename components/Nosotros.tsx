@@ -18,15 +18,8 @@ function scrollTo(id: string) {
 
 export default function Nosotros({ label, title, parrafo1, parrafo2, ctaText, imagen }: NosotrosProps) {
   return (
-    <section id="nosotros" style={{ padding: '100px 48px', maxWidth: '1100px', margin: '0 auto' }}>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '80px',
-          alignItems: 'center',
-        }}
-      >
+    <section id="nosotros" className="section-pad" style={{ maxWidth: '1100px', margin: '0 auto' }}>
+      <div className="nosotros-grid">
         <FadeIn>
           <p
             style={{

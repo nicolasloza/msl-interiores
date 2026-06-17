@@ -1,11 +1,12 @@
 import FadeIn from '@/components/FadeIn';
-import { getSiteSection } from '@/lib/data-access';
+import type { Step } from '@/data/content';
 
-export default async function Proceso() {
-  const { label, title, steps } = await getSiteSection('proceso');
+type Props = { label: string; title: string; steps: Step[] };
+
+export default function Proceso({ label, title, steps }: Props) {
 
   return (
-    <section id="proceso" style={{ background: '#2C2420', padding: '100px 48px' }}>
+    <section id="proceso" className="section-pad" style={{ background: '#2C2420' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <FadeIn>
           <p

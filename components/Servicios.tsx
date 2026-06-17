@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import FadeIn from '@/components/FadeIn';
-import { getSiteSection } from '@/lib/data-access';
-import type { ServiceIconId } from '@/data/content';
+import type { ServiceIconId, Service } from '@/data/content';
+
+type Props = { label: string; title: string; items: Service[] };
 
 const SERVICE_ICONS: Record<ServiceIconId, ReactNode> = {
   'proyecto-integral': (
@@ -30,11 +31,10 @@ const SERVICE_ICONS: Record<ServiceIconId, ReactNode> = {
   ),
 };
 
-export default async function Servicios() {
-  const { label, title, items } = await getSiteSection('servicios');
+export default function Servicios({ label, title, items }: Props) {
 
   return (
-    <section id="servicios" style={{ background: '#F0EBE1', padding: '100px 48px' }}>
+    <section id="servicios" className="section-pad" style={{ background: '#F0EBE1' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <FadeIn>
           <p
