@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getPublishedProjects, getProjectBySlug } from '@/lib/data-access';
 import ProyectoHeader from '@/components/ProyectoHeader';
+import GalleryLightbox from '@/components/GalleryLightbox';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +32,7 @@ export default async function ProyectoPage({ params }: PageProps) {
   const prev = currentIndex > 0 ? PROJECTS[currentIndex - 1] : null;
   const next = currentIndex < PROJECTS.length - 1 ? PROJECTS[currentIndex + 1] : null;
 
-  const [hero, g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11] = project.gallery;
+  const [hero] = project.gallery;
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: '#FDFAF5', color: '#2C2420' }}>
@@ -140,73 +141,13 @@ export default async function ProyectoPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Galería */}
-      <section style={{ padding: '0 48px 80px', maxWidth: '1100px', margin: '0 auto' }}>
-        {/* Fila 1: 2 columnas */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-          {[g1, g2].map((src, i) => src && (
-            <div key={i} className="gallery-item" style={{ aspectRatio: '4/3' }}>
-              <Image src={src} alt={`${project.name} — detalle ${i + 1}`} fill style={{ objectFit: 'cover' }} />
-            </div>
-          ))}
-        </div>
-        {/* Fila 2: imagen ancha */}
-        {g3 && (
-          <div className="gallery-item" style={{ position: 'relative', aspectRatio: '16/7', overflow: 'hidden', marginBottom: '12px' }}>
-            <Image src={g3} alt={`${project.name} — vista general`} fill style={{ objectFit: 'cover' }} />
-          </div>
-        )}
-        {/* Fila 3: 3 columnas */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-          {[g4, g5, g6].map((src, i) => src && (
-            <div key={i} className="gallery-item" style={{ aspectRatio: '3/4' }}>
-              <Image src={src} alt={`${project.name} — detalle ${i + 3}`} fill style={{ objectFit: 'cover' }} />
-            </div>
-          ))}
-        </div>
-        {/* Fila 4: 3 columnas */}
-        {(g7 || g8 || g9) && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-            {[g7, g8, g9].map((src, i) => src && (
-              <div key={i} className="gallery-item" style={{ aspectRatio: '4/3' }}>
-                <Image src={src} alt={`${project.name} — detalle ${i + 6}`} fill style={{ objectFit: 'cover' }} />
-              </div>
-            ))}
-          </div>
-        )}
-        {/* Fila 5: 2 imágenes + celda de datos */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-          {[g10, g11].map((src, i) => src && (
-            <div key={i} className="gallery-item" style={{ aspectRatio: '3/4' }}>
-              <Image src={src} alt={`${project.name} — detalle ${i + 9}`} fill style={{ objectFit: 'cover' }} />
-            </div>
-          ))}
-          {/* Celda de cierre con datos */}
-          <div style={{
-            background: '#2C2420',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: '40px',
-            aspectRatio: '3/4',
-          }}>
-            {project.superficie > 0 && (
-              <>
-                <p className="serif" style={{ color: 'rgba(212,197,169,0.4)', fontSize: '56px', fontWeight: 400, lineHeight: 1, marginBottom: '24px' }}>
-                  {project.superficie}
-                </p>
-                <p style={{ color: 'rgba(253,250,245,0.4)', fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '8px' }}>
-                  metros cuadrados
-                </p>
-                <div style={{ width: '32px', height: '1px', background: 'rgba(212,197,169,0.3)', margin: '20px 0' }} />
-              </>
-            )}
-            <p style={{ color: 'rgba(253,250,245,0.55)', fontSize: '13px', fontWeight: 300, lineHeight: 1.6 }}>
-              {project.tipo}
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Galería con lightbox */}
+      <GalleryLightbox
+        images={project.gallery}
+        projectName={project.name}
+        superficie={project.superficie}
+        tipo={project.tipo}
+      />
 
       {/* Navegación anterior / siguiente */}
       <nav style={{ borderTop: '1px solid #EDE8E0' }}>
