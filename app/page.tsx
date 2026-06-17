@@ -1,5 +1,6 @@
 export const revalidate = 60;
 
+import ScrollToHash from '@/components/ScrollToHash';
 import Navbar from '@/components/Navbar';
 import SplashScreen from '@/components/SplashScreen';
 import Hero from '@/components/Hero';
@@ -19,6 +20,7 @@ export default async function Page() {
 
   return (
     <>
+      <ScrollToHash />
       <SplashScreen />
       <Navbar
         projects={projects}
