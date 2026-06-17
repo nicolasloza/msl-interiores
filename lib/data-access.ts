@@ -1,5 +1,6 @@
 import type { Project, Service, Step } from '@/data/content';
 import { PROJECTS, SERVICES, STEPS } from '@/data/content';
+import { prisma } from '@/lib/prisma';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -54,13 +55,6 @@ function isDbConfigured(): boolean {
   return Boolean(process.env.DATABASE_URL);
 }
 
-// ─── Importación dinámica de Prisma (sólo cuando hay DB) ──────────────────────
-
-async function getPrisma() {
-  const { prisma } = await import('@/lib/prisma');
-  return prisma;
-}
-
 // ─── Mapeador Prisma → ProjectDB ─────────────────────────────────────────────
 
 type PrismaProjectWithImages = {
@@ -113,7 +107,7 @@ export async function getProjects(): Promise<ProjectDB[]> {
   if (!isDbConfigured()) {
     return PROJECTS.map((p, i) => ({ ...p, publicado: true, orden: i + 1 }));
   }
-  const prisma = await getPrisma();
+
   const rows = await prisma.project.findMany({ include: { images: true } });
   return rows.map(mapProject);
 }
@@ -122,7 +116,7 @@ export async function getPublishedProjects(): Promise<ProjectDB[]> {
   if (!isDbConfigured()) {
     return PROJECTS.map((p, i) => ({ ...p, publicado: true, orden: i + 1 }));
   }
-  const prisma = await getPrisma();
+
   const rows = await prisma.project.findMany({
     where: { publicado: true },
     orderBy: { orden: 'asc' },
@@ -136,7 +130,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDB | null> 
     const p = PROJECTS.find((p) => p.slug === slug);
     return p ? { ...p, publicado: true, orden: 1 } : null;
   }
-  const prisma = await getPrisma();
+
   const row = await prisma.project.findUnique({
     where: { slug },
     include: { images: true },
@@ -149,7 +143,7 @@ export async function getProjectById(id: number): Promise<ProjectDB | null> {
     const p = PROJECTS.find((p) => p.id === id);
     return p ? { ...p, publicado: true, orden: 1 } : null;
   }
-  const prisma = await getPrisma();
+
   const row = await prisma.project.findUnique({
     where: { id },
     include: { images: true },
@@ -158,7 +152,7 @@ export async function getProjectById(id: number): Promise<ProjectDB | null> {
 }
 
 export async function createProject(data: Omit<ProjectDB, 'id'>): Promise<ProjectDB> {
-  const prisma = await getPrisma();
+
   const { gallery, materiales, ...rest } = data;
   const row = await prisma.project.create({
     data: {
@@ -176,7 +170,7 @@ export async function createProject(data: Omit<ProjectDB, 'id'>): Promise<Projec
 }
 
 export async function updateProject(id: number, data: Partial<ProjectDB>): Promise<ProjectDB | null> {
-  const prisma = await getPrisma();
+
   const { gallery, materiales, ...rest } = data;
 
   const updates: Record<string, unknown> = { ...rest };
@@ -203,7 +197,7 @@ export async function updateProject(id: number, data: Partial<ProjectDB>): Promi
 
 export async function deleteProject(id: number): Promise<boolean> {
   try {
-    const prisma = await getPrisma();
+  
     await prisma.project.delete({ where: { id } });
     return true;
   } catch {
@@ -212,7 +206,7 @@ export async function deleteProject(id: number): Promise<boolean> {
 }
 
 export async function reorderProjects(orderedIds: number[]): Promise<void> {
-  const prisma = await getPrisma();
+
   await prisma.$transaction(
     orderedIds.map((id, i) =>
       prisma.project.update({ where: { id }, data: { orden: i + 1 } })
@@ -268,7 +262,7 @@ const defaultContent: SiteContent = {
 
 export async function getSiteContent(): Promise<SiteContent> {
   if (!isDbConfigured()) return defaultContent;
-  const prisma = await getPrisma();
+
   const rows = await prisma.siteContent.findMany();
   if (!rows.length) return defaultContent;
 
@@ -286,7 +280,7 @@ export async function getSiteSection<K extends keyof SiteContent>(
   section: K
 ): Promise<SiteContent[K]> {
   if (!isDbConfigured()) return defaultContent[section];
-  const prisma = await getPrisma();
+
   const row = await prisma.siteContent.findUnique({ where: { section } });
   return row ? (row.data as SiteContent[K]) : defaultContent[section];
 }
@@ -295,7 +289,7 @@ export async function updateSiteSection<K extends keyof SiteContent>(
   section: K,
   data: SiteContent[K]
 ): Promise<void> {
-  const prisma = await getPrisma();
+
   await prisma.siteContent.upsert({
     where: { section },
     update: { data: data as object },
