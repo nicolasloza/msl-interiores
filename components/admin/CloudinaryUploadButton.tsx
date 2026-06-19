@@ -4,12 +4,14 @@ import { useEffect, useRef } from 'react';
 import Button from '@mui/material/Button';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 
+import type { GalleryImage } from '@/lib/data-access';
+
 declare global {
   interface Window {
     cloudinary?: {
       openUploadWidget: (
         options: Record<string, unknown>,
-        callback: (error: unknown, result: { event: string; info: { secure_url: string } }) => void
+        callback: (error: unknown, result: { event: string; info: { secure_url: string; public_id: string } }) => void
       ) => void;
     };
   }
@@ -17,7 +19,7 @@ declare global {
 
 type Props = {
   slug: string;
-  onUpload: (urls: string[]) => void;
+  onUpload: (images: GalleryImage[]) => void;
 };
 
 export default function CloudinaryUploadButton({ slug, onUpload }: Props) {
@@ -107,7 +109,7 @@ export default function CloudinaryUploadButton({ slug, onUpload }: Props) {
       (error, result) => {
         if (error) return;
         if (result.event === 'success') {
-          onUpload([result.info.secure_url]);
+          onUpload([{ url: result.info.secure_url, publicId: result.info.public_id }]);
         }
       }
     );

@@ -11,10 +11,11 @@ import AddIcon from '@mui/icons-material/Add';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import Image from 'next/image';
 import CloudinaryUploadButton from './CloudinaryUploadButton';
+import type { GalleryImage } from '@/lib/data-access';
 
 type Props = {
-  images: string[];
-  onChange: (images: string[]) => void;
+  images: GalleryImage[];
+  onChange: (images: GalleryImage[]) => void;
   slug?: string;
 };
 
@@ -30,12 +31,12 @@ export default function GalleryManager({ images, onChange, slug = '' }: Props) {
   function addImage() {
     const url = newUrl.trim();
     if (!url) return;
-    onChange([...images, url]);
+    onChange([...images, { url }]);
     setNewUrl('');
   }
 
-  function addImages(urls: string[]) {
-    onChange([...images, ...urls]);
+  function addImages(newImgs: GalleryImage[]) {
+    onChange([...images, ...newImgs]);
   }
 
   function removeImage(idx: number) {
@@ -72,7 +73,7 @@ export default function GalleryManager({ images, onChange, slug = '' }: Props) {
             marginBottom: '16px',
           }}
         >
-          {images.map((src, idx) => (
+          {images.map((img, idx) => (
             <div
               key={idx}
               draggable
@@ -89,19 +90,19 @@ export default function GalleryManager({ images, onChange, slug = '' }: Props) {
                 transition: 'opacity 0.2s',
               }}
             >
-              {!loadedUrls.has(src) && (
+              {!loadedUrls.has(img.url) && (
                 <Skeleton
                   variant="rectangular"
                   sx={{ position: 'absolute', inset: 0, zIndex: 1, transform: 'none' }}
                 />
               )}
               <Image
-                src={src}
+                src={img.url}
                 alt={`Imagen ${idx + 1}`}
                 fill
                 style={{ objectFit: 'cover' }}
                 sizes="120px"
-                onLoad={() => markLoaded(src)}
+                onLoad={() => markLoaded(img.url)}
               />
               <div
                 style={{

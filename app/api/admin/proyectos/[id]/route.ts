@@ -2,7 +2,7 @@ import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { getProjectById, updateProject, deleteProject } from '@/lib/data-access';
 import { deleteCloudinaryImages } from '@/lib/cloudinary';
-import type { ProjectDB } from '@/lib/data-access';
+import { projectUpdateSchema } from '@/lib/schemas';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -26,8 +26,22 @@ export async function PUT(request: Request, { params }: Params) {
 
   const { id } = await params;
   try {
-    const body = await request.json() as Partial<ProjectDB>;
-    const updated = await updateProject(Number(id), body);
+    const raw = await request.json().catch(() => null);
+    if (!raw) return Response.json({ error: 'Cuerpo inválido' }, { status: 400 });
+
+    const parsed = projectUpdateSchema.safeParse(raw);
+    if (!parsed.success) {
+      const flat = parsed.error.flatten();
+      return Response.json(
+        {
+          error: flat.formErrors[0] ?? 'Datos inválidos',
+          campos: flat.fieldErrors,
+        },
+        { status: 400 }
+      );
+    }
+
+    const updated = await updateProject(Number(id), parsed.data);
     if (!updated) return Response.json({ error: 'Proyecto no encontrado' }, { status: 404 });
     revalidatePath('/', 'layout');
     return Response.json({ project: updated });
@@ -47,12 +61,11 @@ export async function DELETE(_req: Request, { params }: Params) {
   const project = await getProjectById(Number(id));
   if (!project) return Response.json({ error: 'Proyecto no encontrado' }, { status: 404 });
 
-  const allImages = [project.img, ...project.gallery].filter(Boolean);
+  const allImages = [project.img, ...project.gallery].filter(Boolean).map((url) => ({ url }));
 
   const deleted = await deleteProject(Number(id));
   if (!deleted) return Response.json({ error: 'Error al eliminar' }, { status: 500 });
 
-  // Borrar de Cloudinary en background (no bloquea la respuesta)
   deleteCloudinaryImages(allImages).catch(console.error);
 
   revalidatePath('/', 'layout');

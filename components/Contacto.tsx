@@ -58,6 +58,7 @@ function validate(values: FormValues): FormErrors {
 
 export default function Contacto({ label, title, subtitle, email, instagram, instagramUrl }: ContactoProps) {
   const [values, setValues] = useState<FormValues>({ nombre: '', email: '', mensaje: '' });
+  const [honeypot, setHoneypot] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<Status>('idle');
   const [serverError, setServerError] = useState('');
@@ -86,7 +87,7 @@ export default function Contacto({ label, title, subtitle, email, instagram, ins
       const res = await fetch('/api/contacto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, website: honeypot }),
       });
 
       const data = await res.json();
@@ -210,6 +211,19 @@ export default function Contacto({ label, title, subtitle, email, instagram, ins
                   {serverError}
                 </p>
               )}
+
+              <div style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }} aria-hidden="true">
+                <label htmlFor="website">Sitio web</label>
+                <input
+                  id="website"
+                  type="text"
+                  name="website"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
 
               <div style={{ textAlign: 'center' }}>
                 <button

@@ -13,7 +13,7 @@ import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
 import GalleryManager from './GalleryManager';
 import CloudinaryUploadButton from './CloudinaryUploadButton';
-import type { ProjectDB } from '@/lib/data-access';
+import type { ProjectDB, GalleryImage } from '@/lib/data-access';
 
 type FormData = {
   slug: string;
@@ -22,7 +22,7 @@ type FormData = {
   location: string;
   year: number;
   img: string;
-  gallery: string[];
+  gallery: GalleryImage[];
   superficie: number;
   tipo: 'Proyecto integral' | 'Dirección de obra' | 'Proyecto integral + Dirección de obra';
   duracion: string;
@@ -34,8 +34,10 @@ type FormData = {
   orden: number;
 };
 
+type InitialData = Partial<Omit<FormData, 'gallery'>> & { gallery?: string[] | GalleryImage[] };
+
 type Props = {
-  initialData?: Partial<FormData>;
+  initialData?: InitialData;
   projectId?: number;
   mode: 'create' | 'edit';
 };
@@ -53,7 +55,7 @@ const defaultForm: FormData = {
   location: '',
   year: new Date().getFullYear(),
   img: '',
-  gallery: [],
+  gallery: [] as GalleryImage[],
   superficie: 0,
   tipo: 'Proyecto integral',
   duracion: '',
@@ -64,6 +66,13 @@ const defaultForm: FormData = {
   publicado: true,
   orden: 999,
 };
+
+function normalizeGallery(raw?: string[] | GalleryImage[]): GalleryImage[] {
+  if (!raw) return [];
+  return raw.map((item) =>
+    typeof item === 'string' ? { url: item, publicId: null } : item
+  );
+}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -83,8 +92,11 @@ function Row({ children, cols }: { children: React.ReactNode; cols?: string }) {
 
 export default function ProjectForm({ initialData, projectId, mode }: Props) {
   const router = useRouter();
-  const initialForm = useRef<FormData>({ ...defaultForm, ...initialData });
-  const [form, setForm] = useState<FormData>({ ...defaultForm, ...initialData });
+  const normalized = initialData
+    ? { ...initialData, gallery: normalizeGallery(initialData.gallery) }
+    : undefined;
+  const initialForm = useRef<FormData>({ ...defaultForm, ...normalized });
+  const [form, setForm] = useState<FormData>({ ...defaultForm, ...normalized });
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({});
   const isDirty = useMemo(
     () => JSON.stringify(form) !== JSON.stringify(initialForm.current),
@@ -215,7 +227,7 @@ export default function ProjectForm({ initialData, projectId, mode }: Props) {
           {/* Subir nueva */}
           <CloudinaryUploadButton
             slug={form.slug}
-            onUpload={(urls) => set('img', urls[0])}
+            onUpload={(imgs) => set('img', imgs[0]?.url ?? '')}
           />
 
           {/* Elegir de la galería */}
@@ -225,27 +237,27 @@ export default function ProjectForm({ initialData, projectId, mode }: Props) {
                 O elegí de la galería
               </p>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                {form.gallery.map((url, i) => (
+                {form.gallery.map((img, i) => (
                   <button
                     key={i}
                     type="button"
-                    onClick={() => set('img', url)}
+                    onClick={() => set('img', img.url)}
                     title={`Usar imagen ${i + 1} como principal`}
                     style={{
                       width: '56px', height: '42px', padding: 0, cursor: 'pointer',
-                      border: form.img === url ? '2px solid #8B6F47' : '1px solid #EDE8E0',
+                      border: form.img === img.url ? '2px solid #8B6F47' : '1px solid #EDE8E0',
                       overflow: 'hidden', flexShrink: 0, background: 'none',
                       position: 'relative',
-                      opacity: form.img === url ? 1 : 0.75,
+                      opacity: form.img === img.url ? 1 : 0.75,
                       transition: 'opacity 0.15s, border-color 0.15s',
                     }}
                     onMouseOver={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = '1'; }}
-                    onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = form.img === url ? '1' : '0.75'; }}
+                    onMouseOut={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = form.img === img.url ? '1' : '0.75'; }}
                   >
-                    {!loadedImgs.has(url) && (
+                    {!loadedImgs.has(img.url) && (
                       <Skeleton variant="rectangular" sx={{ position: 'absolute', inset: 0, zIndex: 1, transform: 'none' }} />
                     )}
-                    <img src={url} alt={`img ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onLoad={() => markImgLoaded(url)} /> {/* eslint-disable-line @next/next/no-img-element */}
+                    <img src={img.url} alt={`img ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onLoad={() => markImgLoaded(img.url)} /> {/* eslint-disable-line @next/next/no-img-element */}
                   </button>
                 ))}
               </div>

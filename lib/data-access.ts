@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
+export type GalleryImage = { url: string; publicId?: string | null };
+
 export type ProjectDB = Project & {
   publicado: boolean;
   orden: number;
@@ -77,7 +79,7 @@ type PrismaProjectWithImages = {
   resultado: string;
   publicado: boolean;
   orden: number;
-  images: { url: string; orden: number }[];
+  images: { url: string; publicId: string | null; orden: number }[];
 };
 
 function mapProject(p: PrismaProjectWithImages): ProjectDB {
@@ -155,9 +157,13 @@ export async function getProjectById(id: number): Promise<ProjectDB | null> {
   return row ? mapProject(row) : null;
 }
 
-export async function createProject(data: Omit<ProjectDB, 'id'>): Promise<ProjectDB> {
-
+export async function createProject(
+  data: Omit<ProjectDB, 'id'>,
+  galleryImages?: GalleryImage[]
+): Promise<ProjectDB> {
   const { gallery, materiales, ...rest } = data;
+  const items = galleryImages ?? (gallery ?? []).map((url) => ({ url, publicId: null }));
+
   const row = await prisma.project.create({
     data: {
       ...rest,
@@ -165,7 +171,11 @@ export async function createProject(data: Omit<ProjectDB, 'id'>): Promise<Projec
       revestimiento: materiales?.revestimiento ?? '',
       paleta: materiales?.paleta ?? '',
       images: {
-        create: (gallery ?? []).map((url, i) => ({ url, orden: i })),
+        create: items.map((img, i) => ({
+          url: img.url,
+          publicId: img.publicId ?? null,
+          orden: i,
+        })),
       },
     },
     include: { images: true },
@@ -173,8 +183,10 @@ export async function createProject(data: Omit<ProjectDB, 'id'>): Promise<Projec
   return mapProject(row);
 }
 
-export async function updateProject(id: number, data: Partial<ProjectDB>): Promise<ProjectDB | null> {
-
+export async function updateProject(
+  id: number,
+  data: Partial<Omit<ProjectDB, 'gallery'>> & { gallery?: GalleryImage[] }
+): Promise<ProjectDB | null> {
   const { gallery, materiales, ...rest } = data;
 
   const updates: Record<string, unknown> = { ...rest };
@@ -185,10 +197,30 @@ export async function updateProject(id: number, data: Partial<ProjectDB>): Promi
   }
 
   if (gallery !== undefined) {
-    await prisma.projectImage.deleteMany({ where: { projectId: id } });
-    await prisma.projectImage.createMany({
-      data: gallery.map((url, i) => ({ url, orden: i, projectId: id })),
-    });
+    const existingImages = await prisma.projectImage.findMany({ where: { projectId: id } });
+
+    const newUrls = new Set(gallery.map((img) => img.url));
+    const removed = existingImages.filter((img) => !newUrls.has(img.url));
+
+    if (removed.length) {
+      const { deleteCloudinaryImages } = await import('@/lib/cloudinary');
+      deleteCloudinaryImages(removed.map((img) => ({ url: img.url, publicId: img.publicId }))).catch(console.error);
+    }
+
+    const [, , row] = await prisma.$transaction([
+      prisma.projectImage.deleteMany({ where: { projectId: id } }),
+      prisma.projectImage.createMany({
+        data: gallery.map((img, i) => ({
+          url: img.url,
+          publicId: img.publicId ?? null,
+          orden: i,
+          projectId: id,
+        })),
+      }),
+      prisma.project.update({ where: { id }, data: updates, include: { images: true } }),
+    ]);
+
+    return mapProject(row as PrismaProjectWithImages);
   }
 
   const row = await prisma.project.update({

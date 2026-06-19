@@ -1,11 +1,10 @@
-function extractPublicId(url: string): string | null {
+export function extractPublicId(url: string): string | null {
   const idx = url.indexOf('/upload/');
   if (idx === -1) return null;
 
   let path = url.slice(idx + '/upload/'.length);
-  path = path.replace(/\.[^./]+$/, ''); // quita extensión
+  path = path.replace(/\.[^./]+$/, '');
 
-  // Filtra segmentos de transformación (f_auto,q_auto) y versión (v1234567)
   const publicIdParts = path.split('/').filter((seg) =>
     seg &&
     !/^v\d+$/.test(seg) &&
@@ -16,16 +15,17 @@ function extractPublicId(url: string): string | null {
   return publicIdParts.join('/') || null;
 }
 
-export async function deleteCloudinaryImages(urls: string[]): Promise<void> {
+type ImageRef = { url: string; publicId?: string | null };
+
+export async function deleteCloudinaryImages(images: ImageRef[]): Promise<void> {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
   if (!cloudName || !apiKey || !apiSecret || apiKey === 'REEMPLAZAR') return;
 
-  const publicIds = urls
-    .filter((url) => url.includes('cloudinary.com'))
-    .map(extractPublicId)
+  const publicIds = images
+    .map((img) => img.publicId ?? (img.url.includes('cloudinary.com') ? extractPublicId(img.url) : null))
     .filter((id): id is string => Boolean(id));
 
   if (!publicIds.length) return;
