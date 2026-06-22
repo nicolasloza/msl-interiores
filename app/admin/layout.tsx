@@ -1,3 +1,4 @@
+import NextTopLoader from 'nextjs-toploader';
 import AdminThemeProvider from '@/components/admin/AdminThemeProvider';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminSidebar from '@/components/admin/AdminSidebar';
@@ -9,6 +10,7 @@ export const metadata = {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminThemeProvider>
+      <NextTopLoader color="#8B6F47" shadow={false} height={2} showSpinner={false} />
       <div
         style={{
           display: 'flex',

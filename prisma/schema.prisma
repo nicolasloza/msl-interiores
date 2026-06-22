@@ -28,10 +28,7 @@ model Project {
   img           String
   superficie    Float          @default(0)
   tipo          String         @default("Proyecto integral")
-  duracion      String         @default("")
-  piso          String         @default("")
-  revestimiento String         @default("")
-  paleta        String         @default("")
+  details       Json           @default("[]")
   desafio       String         @default("")
   propuesta     String         @default("")
   resultado     String         @default("")

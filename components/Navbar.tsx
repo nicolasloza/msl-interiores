@@ -200,7 +200,7 @@ export default function Navbar({
           background: '#FDFAF5',
           display: 'flex',
           flexDirection: 'column',
-          overflowY: 'auto',
+          overflow: 'hidden',
           boxShadow: '-32px 0 80px rgba(44,36,32,0.15)',
           transform: open ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -247,7 +247,7 @@ export default function Navbar({
         </div>
 
         {/* Ítems de navegación */}
-        <nav style={{ flex: 1, padding: '16px 0' }}>
+        <nav style={{ flex: 1, padding: '16px 0', overflowY: 'auto' }}>
 
           <SidebarLink label="Nosotros" onClick={() => { scrollTo('nosotros'); close(); }} />
           <SidebarLink label="Servicios" onClick={() => { scrollTo('servicios'); close(); }} />

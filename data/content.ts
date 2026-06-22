@@ -1,9 +1,8 @@
 export type NavLink = string;
 
-export type Materiales = {
-  piso: string;
-  revestimiento: string;
-  paleta: string;
+export type ProjectDetail = {
+  label: string;
+  value: string;
 };
 
 export type Project = {
@@ -17,8 +16,7 @@ export type Project = {
   gallery: string[];
   superficie: number;
   tipo: 'Proyecto integral' | 'Dirección de obra' | 'Proyecto integral + Dirección de obra';
-  duracion: string;
-  materiales: Materiales;
+  details: ProjectDetail[];
   desafio: string;
   propuesta: string;
   resultado: string;
@@ -73,12 +71,7 @@ export const PROJECTS: Project[] = [
     ],
     superficie: 0,
     tipo: 'Proyecto integral',
-    duracion: '',
-    materiales: {
-      piso: '',
-      revestimiento: '',
-      paleta: '',
-    },
+    details: [],
     desafio: '',
     propuesta: '',
     resultado: '',

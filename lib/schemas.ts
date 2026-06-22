@@ -11,6 +11,11 @@ const galleryImageSchema = z.object({
   publicId: z.string().nullable().optional(),
 });
 
+const detailItemSchema = z.object({
+  label: z.string(),
+  value: z.string(),
+});
+
 // Reglas de validación sin defaults — base compartida entre create y update
 const projectFields = {
   slug: z
@@ -25,12 +30,7 @@ const projectFields = {
   gallery:    z.array(galleryImageSchema),
   superficie: z.number().min(0, 'La superficie no puede ser negativa'),
   tipo:       z.enum(TIPOS),
-  duracion:   z.string(),
-  materiales: z.object({
-    piso:          z.string(),
-    revestimiento: z.string(),
-    paleta:        z.string(),
-  }),
+  details:    z.array(detailItemSchema),
   desafio:   z.string(),
   propuesta: z.string(),
   resultado: z.string(),
@@ -45,8 +45,7 @@ export const projectCreateSchema = z.object({
   gallery:    projectFields.gallery.default([]),
   superficie: projectFields.superficie.default(0),
   tipo:       projectFields.tipo.default('Proyecto integral'),
-  duracion:   projectFields.duracion.default(''),
-  materiales: projectFields.materiales.default({ piso: '', revestimiento: '', paleta: '' }),
+  details:    projectFields.details.default([]),
   desafio:    projectFields.desafio.default(''),
   propuesta:  projectFields.propuesta.default(''),
   resultado:  projectFields.resultado.default(''),

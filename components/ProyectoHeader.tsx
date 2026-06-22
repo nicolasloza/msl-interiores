@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import type { ProjectDB } from '@/lib/data-access';
+import { useScrolled } from '@/hooks/useScrolled';
 
 function IconMail() {
   return (
@@ -30,6 +31,7 @@ type Props = {
 };
 
 export default function ProyectoHeader({ currentSlug, projects }: Props) {
+  const scrolled = useScrolled();
   const [open, setOpen] = useState(false);
   const [proyectosOpen, setProyectosOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -78,17 +80,20 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
     <>
       <header
         style={{
-          position: 'sticky',
+          position: 'fixed',
           top: 0,
+          left: 0,
+          right: 0,
           zIndex: 100,
-          background: '#FDFAF5',
-          borderBottom: '1px solid #EDE8E0',
+          background: scrolled ? '#FDFAF5' : 'transparent',
+          borderBottom: scrolled ? '1px solid #EDE8E0' : 'none',
           padding: '0 clamp(16px, 4vw, 48px)',
           height: '72px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '16px',
+          transition: 'background 0.4s ease, border-color 0.4s ease',
         }}
       >
         <Link
@@ -97,10 +102,11 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
           style={{
             fontSize: '18px',
             fontWeight: 500,
-            color: '#2C2420',
+            color: scrolled ? '#2C2420' : 'white',
             textDecoration: 'none',
             letterSpacing: '0.04em',
             flexShrink: 0,
+            transition: 'color 0.4s',
           }}
         >
           MSL Interiores
@@ -114,13 +120,13 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
               fontSize: '11px',
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              color: 'rgba(44,36,32,0.45)',
+              color: scrolled ? 'rgba(44,36,32,0.45)' : 'rgba(255,255,255,0.65)',
               textDecoration: 'none',
               transition: 'color 0.2s',
               whiteSpace: 'nowrap',
             }}
-            onMouseOver={(e) => (e.currentTarget.style.color = '#2C2420')}
-            onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(44,36,32,0.45)')}
+            onMouseOver={(e) => (e.currentTarget.style.color = scrolled ? '#2C2420' : 'white')}
+            onMouseOut={(e) => (e.currentTarget.style.color = scrolled ? 'rgba(44,36,32,0.45)' : 'rgba(255,255,255,0.65)')}
           >
             ← Volver a proyectos
           </Link>
@@ -146,7 +152,13 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
-                style={{ display: 'block', width: '24px', height: '1px', background: '#2C2420' }}
+                style={{
+                  display: 'block',
+                  width: '24px',
+                  height: '1px',
+                  background: scrolled ? '#2C2420' : 'white',
+                  transition: 'background 0.4s',
+                }}
               />
             ))}
           </button>
@@ -183,7 +195,7 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
           background: '#FDFAF5',
           display: 'flex',
           flexDirection: 'column',
-          overflowY: 'auto',
+          overflow: 'hidden',
           boxShadow: '-32px 0 80px rgba(44,36,32,0.15)',
           transform: open ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -214,7 +226,7 @@ export default function ProyectoHeader({ currentSlug, projects }: Props) {
         </div>
 
         {/* Ítems */}
-        <nav style={{ flex: 1, padding: '16px 0' }}>
+        <nav style={{ flex: 1, padding: '16px 0', overflowY: 'auto' }}>
           {['Nosotros', 'Servicios'].map((label) => (
             <SidebarLink key={label} label={label} href={`/#${label.toLowerCase()}`} onClick={close} />
           ))}

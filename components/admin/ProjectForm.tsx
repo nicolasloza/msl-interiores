@@ -11,9 +11,13 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
+import IconButton from '@mui/material/IconButton';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 import GalleryManager from './GalleryManager';
 import CloudinaryUploadButton from './CloudinaryUploadButton';
 import type { ProjectDB, GalleryImage } from '@/lib/data-access';
+import type { ProjectDetail } from '@/data/content';
 
 type FormData = {
   slug: string;
@@ -25,8 +29,7 @@ type FormData = {
   gallery: GalleryImage[];
   superficie: number;
   tipo: 'Proyecto integral' | 'Dirección de obra' | 'Proyecto integral + Dirección de obra';
-  duracion: string;
-  materiales: { piso: string; revestimiento: string; paleta: string };
+  details: ProjectDetail[];
   desafio: string;
   propuesta: string;
   resultado: string;
@@ -58,8 +61,7 @@ const defaultForm: FormData = {
   gallery: [] as GalleryImage[],
   superficie: 0,
   tipo: 'Proyecto integral',
-  duracion: '',
-  materiales: { piso: '', revestimiento: '', paleta: '' },
+  details: [],
   desafio: '',
   propuesta: '',
   resultado: '',
@@ -114,10 +116,6 @@ export default function ProjectForm({ initialData, projectId, mode }: Props) {
   function set<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
-  }
-
-  function setMaterial(key: keyof FormData['materiales'], value: string) {
-    setForm((prev) => ({ ...prev, materiales: { ...prev.materiales, [key]: value } }));
   }
 
   function validate(): boolean {
@@ -188,13 +186,14 @@ export default function ProjectForm({ initialData, projectId, mode }: Props) {
         <TextField fullWidth label="Orden" type="number" value={form.orden} onChange={(e) => set('orden', Number(e.target.value))} helperText="Posición en grid" />
       </Row>
 
-      <Row cols="1fr 1fr 1fr">
+      <Row cols="1fr 1fr">
         <TextField fullWidth select label="Tipo de proyecto" value={form.tipo} onChange={(e) => set('tipo', e.target.value as FormData['tipo'])}>
           {TIPO_OPTIONS.map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
         </TextField>
         <TextField fullWidth label="Superficie (m²)" type="number" value={form.superficie} onChange={(e) => set('superficie', Number(e.target.value))} />
-        <TextField fullWidth label="Duración" value={form.duracion} onChange={(e) => set('duracion', e.target.value)} placeholder="Ej: 6 meses" />
       </Row>
+
+      <Divider sx={{ my: 3 }} />
 
       <SectionLabel>Imagen principal</SectionLabel>
 
@@ -273,12 +272,41 @@ export default function ProjectForm({ initialData, projectId, mode }: Props) {
       <SectionLabel>Galería de imágenes</SectionLabel>
       <GalleryManager images={form.gallery} onChange={(imgs) => set('gallery', imgs)} slug={form.slug} />
 
-      <SectionLabel>Materiales</SectionLabel>
-      <Row cols="1fr 1fr 1fr">
-        <TextField fullWidth label="Piso" value={form.materiales.piso} onChange={(e) => setMaterial('piso', e.target.value)} />
-        <TextField fullWidth label="Revestimiento" value={form.materiales.revestimiento} onChange={(e) => setMaterial('revestimiento', e.target.value)} />
-        <TextField fullWidth label="Paleta" value={form.materiales.paleta} onChange={(e) => setMaterial('paleta', e.target.value)} />
-      </Row>
+      <Divider sx={{ my: 3 }} />
+
+      <SectionLabel>Ficha técnica</SectionLabel>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+        {form.details.map((item, idx) => (
+          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '8px', alignItems: 'center', padding: '12px', border: '1px solid #EDE8E0', background: '#F7F3ED' }}>
+            <TextField
+              size="small"
+              label="Etiqueta"
+              value={item.label}
+              placeholder="Ej: Paleta"
+              onChange={(e) => set('details', form.details.map((d, i) => i === idx ? { ...d, label: e.target.value } : d))}
+            />
+            <TextField
+              size="small"
+              label="Valor"
+              value={item.value}
+              placeholder="Ej: Tierra y arena"
+              onChange={(e) => set('details', form.details.map((d, i) => i === idx ? { ...d, value: e.target.value } : d))}
+            />
+            <IconButton size="small" onClick={() => set('details', form.details.filter((_, i) => i !== idx))} sx={{ color: '#b5451b', borderRadius: 0 }}>
+              <DeleteIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </div>
+        ))}
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<AddIcon />}
+          onClick={() => set('details', [...form.details, { label: '', value: '' }])}
+          sx={{ alignSelf: 'flex-start' }}
+        >
+          Agregar detalle
+        </Button>
+      </div>
 
       <SectionLabel>Descripción narrativa</SectionLabel>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>

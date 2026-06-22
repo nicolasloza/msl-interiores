@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import type { Project, Service, Step } from '@/data/content';
+import type { Project, ProjectDetail, Service, Step } from '@/data/content';
 import { PROJECTS, SERVICES, STEPS } from '@/data/content';
 import { prisma } from '@/lib/prisma';
 
@@ -70,10 +70,7 @@ type PrismaProjectWithImages = {
   img: string;
   superficie: number;
   tipo: string;
-  duracion: string;
-  piso: string;
-  revestimiento: string;
-  paleta: string;
+  details: unknown;
   desafio: string;
   propuesta: string;
   resultado: string;
@@ -94,8 +91,7 @@ function mapProject(p: PrismaProjectWithImages): ProjectDB {
     gallery: p.images.sort((a, b) => a.orden - b.orden).map((i) => i.url),
     superficie: p.superficie,
     tipo: p.tipo as Project['tipo'],
-    duracion: p.duracion,
-    materiales: { piso: p.piso, revestimiento: p.revestimiento, paleta: p.paleta },
+    details: (p.details as ProjectDetail[]) ?? [],
     desafio: p.desafio,
     propuesta: p.propuesta,
     resultado: p.resultado,
@@ -161,15 +157,13 @@ export async function createProject(
   data: Omit<ProjectDB, 'id'>,
   galleryImages?: GalleryImage[]
 ): Promise<ProjectDB> {
-  const { gallery, materiales, ...rest } = data;
+  const { gallery, ...rest } = data;
   const items = galleryImages ?? (gallery ?? []).map((url) => ({ url, publicId: null }));
 
   const row = await prisma.project.create({
     data: {
       ...rest,
-      piso: materiales?.piso ?? '',
-      revestimiento: materiales?.revestimiento ?? '',
-      paleta: materiales?.paleta ?? '',
+      details: rest.details ?? [],
       images: {
         create: items.map((img, i) => ({
           url: img.url,
@@ -187,14 +181,9 @@ export async function updateProject(
   id: number,
   data: Partial<Omit<ProjectDB, 'gallery'>> & { gallery?: GalleryImage[] }
 ): Promise<ProjectDB | null> {
-  const { gallery, materiales, ...rest } = data;
+  const { gallery, ...rest } = data;
 
   const updates: Record<string, unknown> = { ...rest };
-  if (materiales) {
-    updates.piso = materiales.piso;
-    updates.revestimiento = materiales.revestimiento;
-    updates.paleta = materiales.paleta;
-  }
 
   if (gallery !== undefined) {
     const existingImages = await prisma.projectImage.findMany({ where: { projectId: id } });

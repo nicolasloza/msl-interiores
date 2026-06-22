@@ -1,13 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
-import Divider from '@mui/material/Divider';
 import Skeleton from '@mui/material/Skeleton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import Image from 'next/image';
 import CloudinaryUploadButton from './CloudinaryUploadButton';
@@ -20,19 +16,11 @@ type Props = {
 };
 
 export default function GalleryManager({ images, onChange, slug = '' }: Props) {
-  const [newUrl, setNewUrl] = useState('');
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [loadedUrls, setLoadedUrls] = useState<Set<string>>(new Set());
 
   function markLoaded(url: string) {
     setLoadedUrls((prev) => new Set([...prev, url]));
-  }
-
-  function addImage() {
-    const url = newUrl.trim();
-    if (!url) return;
-    onChange([...images, { url }]);
-    setNewUrl('');
   }
 
   function addImages(newImgs: GalleryImage[]) {
@@ -165,33 +153,6 @@ export default function GalleryManager({ images, onChange, slug = '' }: Props) {
             Las imágenes se guardan en <code style={{ background: '#EDE8E0', padding: '1px 4px', fontSize: '10px' }}>msl-interiores/proyectos/{slug}</code>
           </p>
         )}
-      </div>
-
-      <Divider sx={{ my: 1.5 }}>
-        <span style={{ fontSize: '11px', color: '#8B6F47', letterSpacing: '0.08em' }}>o pegá una URL</span>
-      </Divider>
-
-      {/* Agregar URL manual */}
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-        <TextField
-          fullWidth
-          size="small"
-          label="URL de imagen"
-          placeholder="https://res.cloudinary.com/..."
-          value={newUrl}
-          onChange={(e) => setNewUrl(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && addImage()}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={addImage}
-          disabled={!newUrl.trim()}
-          startIcon={<AddIcon />}
-          sx={{ flexShrink: 0 }}
-        >
-          Agregar
-        </Button>
       </div>
 
       {images.length > 0 && (

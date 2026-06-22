@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getPublishedProjects, getProjectBySlug } from '@/lib/data-access';
 import ProyectoHeader from '@/components/ProyectoHeader';
 import GalleryLightbox from '@/components/GalleryLightbox';
+import FooterWrapper from '@/components/FooterWrapper';
 
 export const revalidate = 60;
 
@@ -96,27 +97,22 @@ export default async function ProyectoPage({ params }: PageProps) {
       </div>
 
       {/* Ficha técnica */}
-      <section style={{ borderBottom: '1px solid #EDE8E0' }}>
-        <div className="proyecto-ficha-pad">
-          {[
-            { label: 'Superficie', value: `${project.superficie} m²` },
-            { label: 'Tipo de proyecto', value: project.tipo },
-            { label: 'Duración', value: project.duracion },
-            { label: 'Piso', value: project.materiales.piso },
-            { label: 'Revestimiento', value: project.materiales.revestimiento },
-            { label: 'Paleta', value: project.materiales.paleta },
-          ].map((item) => (
-            <div key={item.label} className="ficha-item" style={{ paddingRight: '32px' }}>
-              <p style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8B6F47', marginBottom: '8px' }}>
-                {item.label}
-              </p>
-              <p style={{ fontSize: '14px', fontWeight: 400, lineHeight: 1.5, color: '#2C2420' }}>
-                {item.value}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {project.details.length > 0 && (
+        <section style={{ borderBottom: '1px solid #EDE8E0' }}>
+          <div className="proyecto-ficha-pad">
+            {project.details.map((item) => (
+              <div key={item.label} className="ficha-item" style={{ paddingRight: '32px' }}>
+                <p style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8B6F47', marginBottom: '8px' }}>
+                  {item.label}
+                </p>
+                <p style={{ fontSize: '14px', fontWeight: 400, lineHeight: 1.5, color: '#2C2420' }}>
+                  {item.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Descripción */}
       <section className="proyecto-desc-pad">
@@ -187,19 +183,7 @@ export default async function ProyectoPage({ params }: PageProps) {
         </div>
       </nav>
 
-      {/* Footer */}
-      <footer style={{
-        background: '#2C2420',
-        padding: '24px 48px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '12px',
-      }}>
-        <span className="serif" style={{ color: 'rgba(253,250,245,0.4)', fontSize: '14px' }}>MSL Interiores</span>
-        <span style={{ color: 'rgba(253,250,245,0.3)', fontSize: '12px', letterSpacing: '0.05em' }}>© 2024 · Diseño de interiores residencial</span>
-      </footer>
+      <FooterWrapper />
     </div>
   );
 }

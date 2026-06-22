@@ -134,7 +134,6 @@ function ImageField({ label, value, onChange }: { label: string; value: string; 
           label={label}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          helperText="O pegá una URL directamente"
         />
         <ContentImageUploadButton onUpload={onChange} />
       </div>

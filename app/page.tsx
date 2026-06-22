@@ -10,7 +10,7 @@ import Servicios from '@/components/Servicios';
 import Proyectos from '@/components/Proyectos';
 import Proceso from '@/components/Proceso';
 import Contacto from '@/components/Contacto';
-import Footer from '@/components/Footer';
+import FooterWrapper from '@/components/FooterWrapper';
 import { getSiteContent, getPublishedProjects } from '@/lib/data-access';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -53,7 +53,7 @@ export default async function Page() {
       <Proyectos projects={projects} />
       <Proceso {...content.proceso} />
       <Contacto {...content.contacto} />
-      <Footer {...content.footer} />
+      <FooterWrapper />
     </>
   );
 }
