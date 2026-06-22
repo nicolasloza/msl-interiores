@@ -1,6 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { getSiteSection, updateSiteSection, type SiteContent } from '@/lib/data-access';
+import { deleteCloudinaryImages } from '@/lib/cloudinary';
 
 type Params = { params: Promise<{ section: string }> };
 
@@ -36,6 +37,15 @@ export async function PUT(request: Request, { params }: Params) {
 
   try {
     const body = await request.json();
+
+    if ((section === 'hero' || section === 'nosotros') && body.imagen) {
+      const oldData = await getSiteSection(section as 'hero') as { imagen?: string };
+      const oldUrl = oldData?.imagen;
+      if (oldUrl && oldUrl !== body.imagen && oldUrl.includes('cloudinary.com')) {
+        deleteCloudinaryImages([{ url: oldUrl }]).catch(console.error);
+      }
+    }
+
     await updateSiteSection(section as keyof SiteContent, body);
     revalidatePath('/', 'layout');
     return Response.json({ ok: true });

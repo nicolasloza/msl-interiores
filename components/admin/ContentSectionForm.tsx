@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -9,6 +9,7 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import type { SiteContent } from '@/lib/data-access';
 
 type Props<K extends keyof SiteContent> = {
@@ -24,6 +25,123 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+// ─── Upload de imagen para secciones de contenido ────────────────────────────
+
+function ContentImageUploadButton({ onUpload }: { onUpload: (url: string) => void }) {
+  const scriptLoaded = useRef(false);
+
+  useEffect(() => {
+    if (scriptLoaded.current || document.getElementById('cloudinary-widget-script')) {
+      scriptLoaded.current = true;
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'cloudinary-widget-script';
+    script.src = 'https://upload-widget.cloudinary.com/global/all.js';
+    script.async = true;
+    script.onload = () => { scriptLoaded.current = true; };
+    document.body.appendChild(script);
+  }, []);
+
+  function openWidget() {
+    if (!window.cloudinary) {
+      alert('El widget de Cloudinary todavía está cargando, intentá de nuevo en un segundo.');
+      return;
+    }
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    if (!cloudName || !uploadPreset) return;
+
+    window.cloudinary.openUploadWidget(
+      {
+        cloudName,
+        uploadPreset,
+        folder: 'msl-interiores/Contenido',
+        multiple: false,
+        maxFiles: 1,
+        sources: ['local', 'url', 'camera'],
+        cropping: false,
+        language: 'es',
+        text: {
+          es: {
+            or: 'o',
+            back: 'Atrás',
+            close: 'Cerrar',
+            menu: { files: 'Mis archivos', web: 'Dirección web', camera: 'Cámara' },
+            actions: { upload: 'Subir', clear_all: 'Limpiar todo' },
+            drag_and_drop: { title: 'Arrastrá tu imagen acá', title_single: 'Arrastrá tu imagen acá', subtitle: 'o', button_caption: 'Elegir archivo' },
+            queue: { title: 'Subida', done: 'Listo', statuses: { uploading: 'Subiendo...', error: 'Error', uploaded: 'Subido', aborted: 'Cancelado' } },
+          },
+        },
+        styles: {
+          palette: {
+            window: '#FDFAF5',
+            windowBorder: '#D4C5A9',
+            tabIcon: '#8B6F47',
+            menuIcons: '#5C4A42',
+            textDark: '#2C2420',
+            textLight: '#FDFAF5',
+            link: '#8B6F47',
+            action: '#2C2420',
+            inactiveTabIcon: '#8B6F47',
+            error: '#8B2020',
+            inProgress: '#8B6F47',
+            complete: '#4A7B5C',
+            sourceBg: '#F7F3ED',
+          },
+          fonts: {
+            default: null,
+            "'Inter', sans-serif": { url: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap', active: true },
+          },
+        },
+      },
+      (error, result) => {
+        if (error) return;
+        if (result.event === 'success') {
+          onUpload(result.info.secure_url);
+        }
+      }
+    );
+  }
+
+  return (
+    <Button
+      variant="outlined"
+      size="small"
+      onClick={openWidget}
+      startIcon={<CloudUploadOutlinedIcon />}
+      sx={{ flexShrink: 0, height: '40px' }}
+    >
+      Subir imagen
+    </Button>
+  );
+}
+
+function ImageField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {value && (
+        <img
+          src={value}
+          alt="Preview"
+          style={{ width: '100%', maxHeight: '160px', objectFit: 'cover', border: '1px solid #EDE8E0' }}
+        />
+      )}
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+        <TextField
+          fullWidth
+          size="small"
+          label={label}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          helperText="O pegá una URL directamente"
+        />
+        <ContentImageUploadButton onUpload={onChange} />
+      </div>
+    </div>
+  );
+}
+
 // ─── Editors por sección ──────────────────────────────────────────────────────
 
 function HeroEditor({ data, onChange }: { data: SiteContent['hero']; onChange: (d: SiteContent['hero']) => void }) {
@@ -36,7 +154,7 @@ function HeroEditor({ data, onChange }: { data: SiteContent['hero']; onChange: (
       <TextField fullWidth size="small" label="Título principal" value={data.title} onChange={(e) => set('title', e.target.value)} />
       <TextField fullWidth size="small" multiline label="Subtítulo" value={data.subtitle} onChange={(e) => set('subtitle', e.target.value)} />
       <TextField fullWidth size="small" label="Texto del botón CTA" value={data.ctaText} onChange={(e) => set('ctaText', e.target.value)} />
-      <TextField fullWidth size="small" label="URL imagen de fondo" value={data.imagen} onChange={(e) => set('imagen', e.target.value)} helperText="URL de Unsplash o Cloudinary" />
+      <ImageField label="URL imagen de fondo" value={data.imagen} onChange={(v) => set('imagen', v)} />
     </div>
   );
 }
@@ -52,7 +170,7 @@ function NosotrosEditor({ data, onChange }: { data: SiteContent['nosotros']; onC
       <TextField fullWidth size="small" multiline minRows={3} label="Primer párrafo" value={data.parrafo1} onChange={(e) => set('parrafo1', e.target.value)} />
       <TextField fullWidth size="small" multiline minRows={3} label="Segundo párrafo" value={data.parrafo2} onChange={(e) => set('parrafo2', e.target.value)} />
       <TextField fullWidth size="small" label="Texto del botón CTA" value={data.ctaText} onChange={(e) => set('ctaText', e.target.value)} />
-      <TextField fullWidth size="small" label="URL imagen" value={data.imagen} onChange={(e) => set('imagen', e.target.value)} />
+      <ImageField label="URL imagen" value={data.imagen} onChange={(v) => set('imagen', v)} />
     </div>
   );
 }

@@ -24,6 +24,7 @@ export default function Hero({ label, title, subtitle, ctaText, imagen }: HeroPr
         sizes="100vw"
         style={{ objectFit: 'cover' }}
         priority
+        unoptimized
       />
       <div
         style={{
